@@ -1,6 +1,6 @@
 # v1.0 发布状态
 
-本地技术候选已生成，尚未发布 GitHub Release。公开基线为 `fe026729becdd20d34ea8ac2f9b6d5dc4b2907d9`；原工程和完整恢复材料位于公开仓库之外。结果、命令、哈希和限制见 [候选验收](validation.md)，逐项进度见 [执行台账](task-status.md)。
+本地技术候选已生成，尚未发布 GitHub Release。GitHub CLI 已认证并建立 [Vcamp 私有暂存仓库](https://github.com/lamzihin334455-creator/Vcamp)，用于运行完整 CI；公开和治理门禁尚未完成。公开基线为 `fe026729becdd20d34ea8ac2f9b6d5dc4b2907d9`；原工程和完整恢复材料位于公开仓库之外。结果、命令、哈希和限制见 [候选验收](validation.md)，逐项进度见 [执行台账](task-status.md)。
 
 用户于 2026-10-26 暂缓产品演示视频，后续另议方法。随后已按维护者提供的配置备份落实 4 个角色、5 个模板及其排序，并调整角色管理界面；配置依据见 [内置目录](default-presets.md)。RC.2 的增量验收见 [RC.2 记录](rc.2-validation.md)。视频暂停不阻塞技术检查。以下 RC.1 全量验收保留为历史证据。
 
