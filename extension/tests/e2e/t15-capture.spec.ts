@@ -2,6 +2,8 @@ import { chromium, expect, test, type BrowserContext, type Page } from '@playwri
 import { cp, mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { createServer } from 'node:http';
+import {readStreamManifest,checkPart,decodeStream} from '../../src/data/backup-stream';
+import {previewBackupFile} from '../../src/library/backup-file';
 
 test('T15 installed current frame -> multi-image draft -> HTTP / retry / reader -> backup download / empty-profile import / restart / conflict',async()=>{
   test.setTimeout(120000);
@@ -55,14 +57,27 @@ test('T15 installed current frame -> multi-image draft -> HTTP / retry / reader 
     const trash=(await op(panel,{type:'library.trash.query'})).library.trash.entries.find((e:any)=>e.target.id===target.chatId);await op(panel,{type:'library.trash.restore',target:deleteTarget,expectedRevision:trash.revision});
     await op(panel,{type:'chat.select',...target});await panel.reload();await expect(panel.getByLabel('草稿图片').locator('img')).toHaveCount(1);
     await panel.getByRole('button',{name:'资料库',exact:true}).click();await panel.getByRole('button',{name:'存储管理',exact:true}).click();
-    const downloadPromise=panel.waitForEvent('download');await panel.getByRole('button',{name:'下载资料备份'}).click();const download=await downloadPromise;const file=resolve(output,'backup.json');await download.saveAs(file);
-    const packet=JSON.parse(await readFile(file,'utf8'));expect(packet.manifest.formatVersion).toBe(5);expect(packet.manifest.databaseVersion).toBe(9);expect(packet.payload.attachments).toHaveLength(3);expect(JSON.stringify(packet)).not.toContain('T15_SYNTHETIC_KEY');
+    const downloadPromise=panel.waitForEvent('download');await panel.getByRole('button',{name:'下载资料备份'}).click();const download=await downloadPromise;const file=resolve(output,'backup.vcamp');await download.saveAs(file);
+    const bytes=await readFile(file),newline=bytes.indexOf(10);
+    expect(newline).toBeGreaterThan(0);
+    const manifest=await readStreamManifest(bytes.subarray(0,newline).toString('utf8')),backupParts:string[]=[];
+    let offset=newline+1;
+    for(const [index,part]of manifest.parts.entries()){
+      const text=bytes.subarray(offset,offset+part.bytes).toString('utf8');
+      await checkPart(manifest,index,text);backupParts.push(text);offset+=part.bytes;
+    }
+    expect(offset).toBe(bytes.length);
+    const packet={manifest,payload:await decodeStream(manifest,backupParts)};
+    expect(packet.manifest).toMatchObject({format:'vcamp-backup-stream',formatVersion:1,databaseVersion:10});
+    expect(packet.payload.attachments).toHaveLength(3);expect(JSON.stringify(packet)).not.toContain('T15_SYNTHETIC_KEY');
+    const originalDraftImage=packet.payload.attachments.find(image=>image.id===draftId);
+    if(!originalDraftImage)throw Error('Backup lost the draft image');
     const second=await launch(profiles[1]);await second.panel.getByRole('button',{name:'资料库',exact:true}).click();await second.panel.getByRole('button',{name:'存储管理',exact:true}).click();await second.panel.getByLabel('选择备份文件').setInputFiles(file);await expect(second.panel.getByLabel('导入概览')).toBeVisible();await second.panel.getByRole('button',{name:'确认恢复备份'}).click();await expect(second.panel.getByText(/备份恢复完成：/)).toBeVisible();await second.context.close();
     const restarted=await launch(profiles[1]);const site2=await restarted.context.newPage();await site2.goto('https://www.bilibili.com/video/BVfixture/?p=2');await expect(restarted.panel.locator('.context-current-button .sr-only')).toHaveText('完整字幕已就绪');await op(restarted.panel,{type:'chat.select',...target});await restarted.panel.reload();await expect(restarted.panel.getByLabel('草稿图片').locator('img')).toHaveCount(1);await expect(restarted.panel.getByLabel('历史图片').locator('img')).toHaveCount(2);
-    expect((await op(restarted.panel,{type:'attachment.read',target,ids:[draftId]})).attachment.images[0].sha256).toBe(packet.payload.attachments.find((i:any)=>i.id===draftId).sha256);
-    await restarted.panel.getByLabel('输入草稿').fill('本机冲突');await expect(restarted.panel.getByRole('status')).toHaveText('草稿已保存');await site2.close();const plan=(await op(restarted.panel,{type:'library.backup.preview',file:await readFile(file,'utf8')})).library.backup.plan;await op(restarted.panel,{type:'library.backup.execute',planId:plan.planId,checksum:plan.checksum});const mapped=plan.mapping.find((m:any)=>m.from===target.chatId).to;expect(mapped).not.toBe(target.chatId);
+    expect((await op(restarted.panel,{type:'attachment.read',target,ids:[draftId]})).attachment.images[0].sha256).toBe(originalDraftImage.sha256);
+    await restarted.panel.getByLabel('输入草稿').fill('本机冲突');await expect(restarted.panel.getByRole('status')).toHaveText('草稿已保存');await site2.close();const plan=await previewBackupFile(new File([new Uint8Array(await readFile(file))],'backup.vcamp'),async operation=>(await op(restarted.panel,operation)).library);await op(restarted.panel,{type:'library.backup.execute',planId:plan.planId,checksum:plan.checksum});const mapped=plan.mapping.find((m:any)=>m.from===target.chatId)!.to;expect(mapped).not.toBe(target.chatId);
     const rebound=await restarted.context.newPage();await rebound.goto('https://www.bilibili.com/video/BVfixture/?p=2');await expect(restarted.panel.locator('.context-current-button .sr-only')).toHaveText('完整字幕已就绪');
-    const copied=await op(restarted.panel,{type:'chat.select',workspaceId:target.workspaceId,chatId:mapped});const copyImages=(await op(restarted.panel,{type:'attachment.read',target:{workspaceId:target.workspaceId,chatId:mapped},ids:copied.draft.attachmentIds})).attachment.images;expect(copyImages[0].sha256).toBe(packet.payload.attachments.find((i:any)=>i.id===draftId).sha256);expect(copyImages[0].id).not.toBe(draftId);expect(requests).toHaveLength(2);
+    const copied=await op(restarted.panel,{type:'chat.select',workspaceId:target.workspaceId,chatId:mapped});const copyImages=(await op(restarted.panel,{type:'attachment.read',target:{workspaceId:target.workspaceId,chatId:mapped},ids:copied.draft.attachmentIds})).attachment.images;expect(copyImages[0].sha256).toBe(originalDraftImage.sha256);expect(copyImages[0].id).not.toBe(draftId);expect(requests).toHaveLength(2);
     // Real isolated capture adapter, transparent decode placeholder and old-P results.
     await site.bringToFront();await site.evaluate(()=>document.querySelector('video')!.pause());await panel.goto(`chrome-extension://${first.id}/sidepanel.html`);await op(panel,{type:'chat.select',...target});
     const resizeBound=await query(panel);await panel.evaluate(async binding=>{await chrome.scripting.executeScript({target:{tabId:binding.tabId,documentIds:[binding.documentId]},world:'ISOLATED',func:()=>{const prototype=HTMLCanvasElement.prototype,original=prototype.toDataURL;(globalThis as any).originalToDataURL=original;(globalThis as any).toDataURLCalls=0;prototype.toDataURL=function(...args){(globalThis as any).toDataURLCalls++;return (globalThis as any).toDataURLCalls===1?'data:image/png;base64,'+'A'.repeat(5600000):original.apply(this,args as any);};}});},resizeBound.video.binding);
