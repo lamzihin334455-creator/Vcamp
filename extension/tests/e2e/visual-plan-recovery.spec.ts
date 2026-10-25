@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {expect,test} from '@playwright/test';
 import {setup} from './interaction-fixture';
 import {writeFile} from 'node:fs/promises';
@@ -33,7 +34,7 @@ for(const variant of ['cue','schema','json','cache','stop'] as const)test(`a com
     const provider=await command({type:'provider.fetch',expectedRevision:1});
     await command({type:'provider.import-models',expectedRevision:provider.view.provider.revision,modelIds:['deepseek-flash']});
     await page.reload();await site.bringToFront();
-    await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+    await startNewChat(page);
     await page.getByRole('button',{name:'联网',exact:true}).click();
     await page.getByRole('button',{name:'更多输入操作'}).click();await page.getByRole('button',{name:/^开启自主识别画面/}).click();
     const current=(await command({type:'workspace.query'})).view,target={kind:'chat',workspaceId:current.workspaceId,chatId:current.chatId};

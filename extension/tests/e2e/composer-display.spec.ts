@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {expect,test} from '@playwright/test';
 import {setup} from './interaction-fixture';
 
@@ -15,7 +16,7 @@ test('HTML styles open to the left without moving the output anchor and remain g
    expect(styleBox.x).toBeGreaterThanOrEqual(plus.x+plus.width);expect(styleBox.x+styleBox.width).toBeLessThanOrEqual(outputBox.x);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   }
   await page.setViewportSize({width:400,height:850});await page.screenshot({path:test.info().outputPath('style-left.png'),animations:'disabled'});
-  await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+  await startNewChat(page);
   await output.click();await page.getByRole('menuitemradio',{name:'HTML 页面',exact:true}).click();await expect(selected).toBeVisible();await expect(styles).toHaveCount(0);await selected.click();await expect(styles.getByRole('menuitemradio',{name:'新拟态',exact:true})).toHaveAttribute('aria-checked','true');
   await page.keyboard.press('Escape');await page.reload();await expect(output).toBeVisible();await expect(selected).toBeVisible();
   await site.goto('https://www.bilibili.com/video/BVsingle/');await site.bringToFront();await expect(page.locator('.context-current-button strong')).toHaveText('单视频样本');

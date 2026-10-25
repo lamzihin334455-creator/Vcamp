@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {expect,test} from '@playwright/test';
 import {writeFile} from 'node:fs/promises';
 import {setup} from './interaction-fixture';
@@ -30,7 +31,7 @@ for(const output of ['markdown','html'] as const)test(`autonomous ${output} pres
   await expect(page.locator('.context-current-button .sr-only')).toHaveText('完整字幕已就绪');
   await expect(page.getByTestId('startup')).toHaveCount(0);
   const previousChat=(await command({type:'workspace.query'})).view.chatId;
-  await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+  await startNewChat(page);
   await expect.poll(async()=>(await command({type:'workspace.query'})).view.chatId).not.toBe(previousChat);
   await page.getByLabel('输入草稿').fill(output==='markdown'?'@独立阅读文档':'@风格化交互页面');
   await page.locator('#mention-menu').getByRole('button',{name:output==='markdown'?'独立阅读文档':'风格化交互页面',exact:true}).click();

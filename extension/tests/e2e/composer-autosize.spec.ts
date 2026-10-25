@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {expect,test,type Locator,type Page} from '@playwright/test';
 import {setup} from './interaction-fixture';
 
@@ -8,8 +9,7 @@ const geometry=(input:Locator)=>input.evaluate(element=>{
 });
 async function blankChat(page:Page){
   await page.emulateMedia({reducedMotion:'reduce'});
-  await page.getByRole('button',{name:'切换当前内容'}).click();
-  await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+  await startNewChat(page);
   await expect(page.getByLabel('输入草稿')).toHaveValue('');
 }
 

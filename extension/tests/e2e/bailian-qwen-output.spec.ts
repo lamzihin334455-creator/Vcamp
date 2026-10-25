@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {expect,test} from '@playwright/test';
 import {writeFile} from 'node:fs/promises';
 import {setup} from './interaction-fixture';
@@ -29,7 +30,7 @@ test('Bailian Qwen template HTML: report genuine truncation, never save fragment
     provider=(await command({type:'provider.fetch',expectedRevision:provider.revision})).view.provider;
     await command({type:'provider.import-models',modelIds:['qwen3.8-flash'],expectedRevision:provider.revision});
     await page.reload();await expect(page.getByTestId('startup')).toHaveCount(0);
-    await page.getByRole('button',{name:'切换当前内容',exact:true}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+    await startNewChat(page);
     await page.getByLabel('输入草稿',{exact:true}).fill('@风格化交互页面');
     await page.locator('#mention-menu').getByRole('button',{name:'风格化交互页面',exact:true}).click();
     await expect(page.getByRole('button',{name:'移除任务模板 风格化交互页面',exact:true})).toBeVisible();

@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {expect,test} from '@playwright/test';
 import {writeFile} from 'node:fs/promises';
 import {setup} from './interaction-fixture';
@@ -28,7 +29,7 @@ for(const variant of ['shared','distinct'] as const)test(`valid ${variant} eight
   await page.reload();await site.bringToFront();
   await expect(page.locator('.context-current-button .sr-only')).toHaveText('完整字幕已就绪');
   await expect(page.getByTestId('startup')).toHaveCount(0);
-  await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+  await startNewChat(page);
   await page.getByLabel('输入草稿').fill('@独立阅读文档');
   await page.locator('#mention-menu').getByRole('button',{name:'独立阅读文档',exact:true}).click();
   await page.getByRole('button',{name:'更多输入操作'}).click();await page.getByRole('button',{name:/^开启自主识别画面/}).click();

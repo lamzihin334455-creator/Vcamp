@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {expect,test,type Page} from '@playwright/test';
 import {setup} from './interaction-fixture';
 
@@ -48,8 +49,7 @@ test('preview expands landscape images and adapts while open in narrow and short
   const {context,page,site,forbidden}=await setup();
   try{
     await page.reload();await site.bringToFront();
-    await page.getByRole('button',{name:'切换当前内容'}).click();
-    await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+    await startNewChat(page);
     await addImage(page,'landscape.png',1920,1080);
     await page.setViewportSize({width:993,height:861});
     const opener=page.getByRole('button',{name:'预览图片 landscape.png',exact:true});
@@ -75,8 +75,7 @@ test('portrait image and long filename leave the full frame and close control re
   const {context,page,site}=await setup();
   try{
     await page.reload();await site.bringToFront();
-    await page.getByRole('button',{name:'切换当前内容'}).click();
-    await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+    await startNewChat(page);
     const name='portrait-with-a-long-filename-for-reading-image-metadata.png';
     await addImage(page,name,900,1600);
     await page.setViewportSize({width:280,height:700});

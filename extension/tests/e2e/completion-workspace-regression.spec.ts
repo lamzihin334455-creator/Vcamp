@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {expect,test} from '@playwright/test';
 import {writeFile} from 'node:fs/promises';
 import {setup} from './interaction-fixture';
@@ -24,8 +25,7 @@ for(const longAnswer of [false,true])test(`completed ${longAnswer?'long':'short'
     await command({type:'provider.import-models',modelIds:['deepseek-flash'],expectedRevision:provider.revision});
     await page.reload();await expect(page.getByTestId('startup')).toHaveCount(0);await site.bringToFront();
     const oldChat=(await command({type:'workspace.query'})).view.chatId;
-    await page.getByRole('button',{name:'切换当前内容',exact:true}).click();
-    await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+    await startNewChat(page);
     await expect.poll(async()=>(await command({type:'workspace.query'})).view.chatId).not.toBe(oldChat);
     await page.getByLabel('输入草稿',{exact:true}).fill('概括这个视频');
     await expect(page.getByRole('button',{name:'发送',exact:true})).toBeEnabled();

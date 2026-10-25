@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {expect,test} from '@playwright/test';
 import {setup} from './interaction-fixture';
 
@@ -22,7 +23,7 @@ test('system default synchronizes current chat; independent overrides control ac
     let fetched=await command({type:'provider.fetch',expectedRevision:1});fetched=await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:fetched.view.provider.catalog.map((model:any)=>model.id)});
     expect((await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['deepseek-flash']})).ok).toBe(true);
     await page.reload();await site.bringToFront();
-    const newChat=async()=>{await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();};
+    const newChat=async()=>{await startNewChat(page);};
     const top=page.getByRole('button',{name:'联网',exact:true});
     const saved=async()=>(await command({type:'workspace.query'})).view;
     const searches=async()=>worker.evaluate(()=>(globalThis as any).permissionRequests.filter((r:any)=>r.kind==='search').length);

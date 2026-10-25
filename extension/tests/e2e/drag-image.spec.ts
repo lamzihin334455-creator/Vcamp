@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {expect,test} from '@playwright/test';
 import {setup} from './interaction-fixture';
 import {png} from '../fixtures/png';
@@ -6,8 +7,7 @@ test('dropping a local image adds it to the current draft with its filename',asy
   const {context,page,site}=await setup();
   try{
     await page.reload();await site.bringToFront();
-    await page.getByRole('button',{name:'切换当前内容'}).click();
-    await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+    await startNewChat(page);
     const command=(operation:any)=>page.evaluate(operation=>chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation}),operation);
     const current=(await command({type:'workspace.query'})).view;
     const encoded=png().slice(png().indexOf(',')+1);
@@ -30,8 +30,7 @@ test('the plus menu adds local images and pasted images as removable thumbnails'
   const {context,page,site}=await setup();
   try{
     await page.reload();await site.bringToFront();
-    await page.getByRole('button',{name:'切换当前内容'}).click();
-    await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+    await startNewChat(page);
     const encoded=png().slice(png().indexOf(',')+1);
     await page.getByRole('button',{name:'更多输入操作'}).click();
     const chooser=page.waitForEvent('filechooser');

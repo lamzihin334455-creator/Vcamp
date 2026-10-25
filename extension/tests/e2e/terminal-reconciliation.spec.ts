@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {expect,test} from '@playwright/test';
 import {writeFile} from 'node:fs/promises';
 import {setup} from './interaction-fixture';
@@ -36,8 +37,7 @@ for(const mode of ['held','missed-event','all-slow'] as const)test(`a completed 
       }) as any;
     });
     await page.reload();await expect(page.getByTestId('startup')).toHaveCount(0);await site.bringToFront();
-    await page.getByRole('button',{name:'切换当前内容',exact:true}).click();
-    await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+    await startNewChat(page);
     await page.getByRole('button',{name:/^产物类型：/}).click();
     await page.getByRole('menuitemradio',{name:'Markdown 笔记',exact:true}).click();
     await page.getByLabel('输入草稿',{exact:true}).fill('生成完整笔记');

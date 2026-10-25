@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import { chromium, expect, test, type Page, type BrowserContext } from '@playwright/test';
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
@@ -33,8 +34,7 @@ async function installedPanel() {
 // Read the UI client's responses; extra workspace.query calls would change the router's current selection.
 const view = (page: Page) => page.evaluate(() => (window as any).t03View);
 async function newChat(page: Page) {
-  await page.getByRole('button', { name: '切换当前内容', exact: true }).click();
-  await page.getByRole('menuitem', { name: '新对话', exact: true }).click();
+  await startNewChat(page);
 }
 async function selectChat(page: Page, id: string) {
   const chat = (await view(page)).chats.find((chat: { id: string }) => chat.id === id);

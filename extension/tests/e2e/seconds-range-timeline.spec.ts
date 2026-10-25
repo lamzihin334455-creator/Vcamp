@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {expect,test,chromium} from '@playwright/test';
 import {build} from 'esbuild';
 import {readFile,writeFile} from 'node:fs/promises';
@@ -106,7 +107,7 @@ test('production answer receives copyable time context, renders numeric ranges a
       }) as any;
     });
     const old=(await command({type:'workspace.query'})).view.chatId;
-    await page.getByRole('button',{name:'切换当前内容',exact:true}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+    await startNewChat(page);
     await expect.poll(async()=>(await command({type:'workspace.query'})).view.chatId).not.toBe(old);
     await page.getByLabel('输入草稿',{exact:true}).fill('引用这两处原文');await page.getByRole('button',{name:'发送',exact:true}).click();
     await expect(page.getByRole('button',{name:'01:46–02:38',exact:true})).toBeVisible();

@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import { expect, test } from '@playwright/test';
 import { setup } from './interaction-fixture';
 
@@ -23,8 +24,7 @@ test('roles live in settings, templates carry data policy, and both freeze into 
     const fetched = await command({ type: 'provider.fetch', expectedRevision: 1 });
     expect((await command({ type: 'provider.import-models', expectedRevision: fetched.view.provider.revision, modelIds: ['local-text'] })).ok).toBe(true);
     await page.reload(); await site.bringToFront();
-    await page.getByRole('button', { name: '切换当前内容' }).click();
-    await page.getByRole('menuitem', { name: '新对话', exact: true }).click();
+    await startNewChat(page);
 
     await expect(page.getByLabel('输入区')).not.toContainText('当前对话角色');
     await expect(page.getByLabel('输入区')).not.toContainText('管理角色');

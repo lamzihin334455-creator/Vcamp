@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {test,expect} from '@playwright/test';
 import {writeFile,mkdir,readFile} from 'node:fs/promises';
 import {resolve,basename} from 'node:path';
@@ -52,7 +53,7 @@ test('generation stays in the worker and frozen A while the workbench follows B'
     const command=(operation:any)=>page.evaluate(async operation=>chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation}),operation);
     expect((await command({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'SYNTHETIC_LOCAL_ONLY'})).ok).toBe(true);const fetched=await command({type:'provider.fetch',expectedRevision:1});expect(fetched.view.provider.status).toBe('ready');expect((await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['local-fixture']})).ok).toBe(true);
     await page.reload();await site.bringToFront();await expect(page.locator('.context-current-button .sr-only')).toHaveText('完整字幕已就绪');
-    await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();await expect(page.locator('.context-module')).toHaveText('对话 02');fixture.chatId=(await command({type:'workspace.query'})).view.chatId;
+    await startNewChat(page);await expect(page.locator('.context-module')).toHaveText('对话 02');fixture.chatId=(await command({type:'workspace.query'})).view.chatId;
     await page.getByLabel('输入草稿').fill('A 视频的独立 HTML 学习页');await page.getByRole('button',{name:/产物类型/}).click();await page.getByRole('menuitemradio',{name:/HTML/}).click();
     const pagesBefore=context.pages().length;await page.getByRole('button',{name:'发送',exact:true}).click();
     await expect.poll(()=>worker.evaluate(()=>(globalThis as any).syntheticCalls.map((call:any)=>call.kind))).toEqual(['requirements','answer']);
@@ -80,7 +81,7 @@ test('pending A media is lost on switching to B and only explicit subtitle conti
     const command=(operation:any)=>page.evaluate(operation=>chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation}),operation);
     expect((await command({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'SYNTHETIC_LOCAL_ONLY'})).ok).toBe(true);const fetched=await command({type:'provider.fetch',expectedRevision:1});await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['local-fixture']});
     await page.reload();await site.bringToFront();await expect(page.locator('.context-current-button .sr-only')).toHaveText('完整字幕已就绪');
-    await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();await expect(page.locator('.context-module')).toHaveText('对话 02');fixture.chatId=(await command({type:'workspace.query'})).view.chatId;
+    await startNewChat(page);await expect(page.locator('.context-module')).toHaveText('对话 02');fixture.chatId=(await command({type:'workspace.query'})).view.chatId;
     await page.getByRole('button',{name:'更多输入操作'}).click();await page.getByRole('button',{name:/^开启自主识别画面/}).click();
     await page.getByLabel('输入草稿').fill('A 的原视频画面说明');await page.getByRole('button',{name:'发送',exact:true}).click();
     const query=async()=> (await command({type:'generation.query',target:{kind:'chat',workspaceId:fixture.workspaceId,chatId:fixture.chatId}})).view.generation.jobs.at(-1);
@@ -91,7 +92,7 @@ test('pending A media is lost on switching to B and only explicit subtitle conti
     const calls=await worker.evaluate(()=>(globalThis as any).visionCalls);expect(calls).toEqual([{kind:'requirements',hasB:false,hasImages:false},{kind:'vision',hasB:false,hasImages:false},{kind:'answer',hasB:false,hasImages:false}]);expect((await query()).visual).toMatchObject({resolution:'subtitle',attachmentIds:[]});expect(context.pages()).toHaveLength(pagesBefore);
     // Positive path: worker execution still captures the actual original MP4,
     // attaches the frame to this A task, and restores the untouched player.
-    await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();await expect(page.locator('.context-module')).toHaveText('对话 03');fixture.chatId=(await command({type:'workspace.query'})).view.chatId;
+    await startNewChat(page);await expect(page.locator('.context-module')).toHaveText('对话 03');fixture.chatId=(await command({type:'workspace.query'})).view.chatId;
     await page.getByRole('button',{name:'更多输入操作'}).click();await page.getByRole('button',{name:/^开启自主识别画面/}).click();await page.getByLabel('输入草稿').fill('A 的单帧依据');await page.getByRole('button',{name:'发送',exact:true}).click();await expect.poll(()=>worker.evaluate(()=>(globalThis as any).visionCalls.length)).toBe(5);await site.bringToFront();const originalTime=await site.locator('video').evaluate((v:HTMLVideoElement)=>v.currentTime);await worker.evaluate(()=>(globalThis as any).finishPlan());await expect.poll(async()=> (await query()).state).toBe('completed');
     expect((await query()).visual.attachmentIds).toHaveLength(1);expect((await query()).visual.review.status).toBe('complete');expect((await query()).visual.review.correction).toBeUndefined();const allCalls=await worker.evaluate(()=>(globalThis as any).visionCalls);expect(allCalls).toEqual([...calls,{kind:'requirements',hasB:false,hasImages:false},{kind:'vision',hasB:false,hasImages:false},{kind:'review',hasB:false,hasImages:true},{kind:'answer',hasB:false,hasImages:true}]);await expect.poll(()=>site.locator('video').evaluate((v:HTMLVideoElement)=>v.currentTime)).toBeCloseTo(originalTime,2);expect(await site.locator('video').evaluate((v:HTMLVideoElement)=>v.paused)).toBe(true);expect(context.pages()).toHaveLength(pagesBefore);
     await writeFile(resolve(output,'media-loss-result.json'),JSON.stringify({heldBeforeAnswer:true,mediaFailure:waiting.visual.mediaFailure,noBFrames:true,noBSeek:true,explicitSubtitleContinuation:true,noNewPages:true,positiveOriginalFrame:true,restoredOriginalTime:true,syntheticTransportPosts:allCalls.length,externalModelCalls:0},null,2));

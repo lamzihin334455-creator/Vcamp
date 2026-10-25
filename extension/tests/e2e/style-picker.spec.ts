@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {expect,test} from '@playwright/test';
 import {setup} from './interaction-fixture';
 
@@ -12,7 +13,7 @@ test('entering HTML keeps the remembered style visible without opening its menu'
   await output.click();await page.getByRole('menuitemradio',{name:'Chat 问答',exact:true}).click();
   await output.click();await page.getByRole('menuitemradio',{name:'HTML 页面',exact:true}).click();
   await expect(page.getByRole('button',{name:'HTML 风格：新拟态',exact:true})).toHaveAttribute('aria-expanded','false');await expect(menu).toHaveCount(0);
-  await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+  await startNewChat(page);
   await output.click();await page.getByRole('menuitemradio',{name:'HTML 页面',exact:true}).click();await expect(page.getByRole('button',{name:'HTML 风格：新拟态',exact:true})).toBeVisible();await expect(menu).toHaveCount(0);
   await page.reload();await expect(page.getByTestId('startup')).toHaveCount(0);await expect(page.getByRole('button',{name:'HTML 风格：新拟态',exact:true})).toBeVisible();await expect(menu).toHaveCount(0);
   await page.screenshot({path:test.info().outputPath('remembered-style-closed.png'),animations:'disabled'});expect(forbidden).toEqual([]);

@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {expect,test} from '@playwright/test';
 import {writeFile} from 'node:fs/promises';
 import {setup} from './interaction-fixture';
@@ -37,7 +38,7 @@ for(const mode of ['mixed','required'] as const)test(`excess review suggestions:
     expect(fetched.ok).toBe(true);
     expect((await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['local-vision']})).ok).toBe(true);
     await page.reload();await site.bringToFront();
-    await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+    await startNewChat(page);
     await page.getByRole('button',{name:'更多输入操作'}).click();await page.getByRole('button',{name:/^开启自主识别画面/}).click();
     const current=(await command({type:'workspace.query'})).view,target={kind:'chat',workspaceId:current.workspaceId,chatId:current.chatId},input=`核对三处布局 ${mode}`;
     await page.getByLabel('输入草稿').fill(input);await page.getByRole('button',{name:'发送',exact:true}).click();

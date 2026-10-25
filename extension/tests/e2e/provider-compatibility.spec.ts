@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import { expect, test } from '@playwright/test';
 import { resolve } from 'node:path';
 import { mkdir } from 'node:fs/promises';
@@ -14,7 +15,7 @@ for (const mode of ['test-extension', 'production'] as const) test(`${mode}: pro
     if (mode === 'production') {
       const chatId = () => page.evaluate(async () => (await chrome.runtime.sendMessage({ version: 1, requestId: crypto.randomUUID(), windowId: (await chrome.windows.getCurrent()).id, operation: { type: 'workspace.query' } })).view.chatId);
       const previousChat = await chatId();
-      await page.getByRole('button', { name: '切换当前内容', exact: true }).click(); await page.getByRole('menuitem', { name: '新对话', exact: true }).click();
+      await startNewChat(page);
       await expect.poll(chatId).not.toBe(previousChat);
       await page.reload(); await expect(page.getByTestId('startup')).toHaveCount(0);
     }

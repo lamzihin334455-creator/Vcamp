@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {expect,test} from '@playwright/test';
 import {readFile} from 'node:fs/promises';
 import {setup} from './interaction-fixture';
@@ -22,7 +23,7 @@ test('web HTTP failure persists safe diagnostics with copy, download and clipboa
     let provider=await command({type:'provider.fetch',expectedRevision:1});provider=await command({type:'provider.import-models',expectedRevision:provider.view.provider.revision,modelIds:provider.view.provider.catalog.map((model:any)=>model.id)});
     await command({type:'provider.import-models',expectedRevision:provider.view.provider.revision,modelIds:['deepseek-flash']});
     await page.reload();await site.bringToFront();
-    await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+    await startNewChat(page);
     await page.getByRole('button',{name:'联网',exact:true}).click();
     await page.getByLabel('输入草稿').fill('PRIVATE_USER_QUESTION');await page.getByRole('button',{name:'发送',exact:true}).click();
     await expect(page.getByRole('alert')).toContainText('搜索服务拒绝请求（HTTP 400）');

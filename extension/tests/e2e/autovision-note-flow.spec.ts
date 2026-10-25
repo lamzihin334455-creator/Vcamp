@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {expect,test} from '@playwright/test';
 import {setup} from './interaction-fixture';
 
@@ -21,7 +22,7 @@ test('a normal request cannot make the planner start video-frame capture',async(
     const fetched=await command({type:'provider.fetch',expectedRevision:1});
     expect((await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['local-vision']})).ok).toBe(true);
     await page.reload();await site.bringToFront();
-    await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+    await startNewChat(page);
     {const current=(await command({type:'workspace.query'})).view;fixture.workspaceId=current.workspaceId;fixture.chatId=current.chatId;}
     await page.getByLabel('输入草稿').fill('概括一下视频内容');await page.getByRole('button',{name:'发送',exact:true}).click();
     const query=async()=> (await command({type:'generation.query',target:{kind:'chat',workspaceId:fixture.workspaceId,chatId:fixture.chatId}})).view.generation;
@@ -63,8 +64,7 @@ test('builtin knowledge note carries its task into autonomous vision and stores 
     const fetched=await command({type:'provider.fetch',expectedRevision:1});
     expect((await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['local-vision']})).ok).toBe(true);
     await page.reload();await site.bringToFront();
-    await page.getByRole('button',{name:'切换当前内容'}).click();
-    await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+    await startNewChat(page);
     {const current=(await command({type:'workspace.query'})).view;fixture.workspaceId=current.workspaceId;fixture.chatId=current.chatId;}
     await page.getByLabel('输入草稿').fill('@独立阅读文档');
     await page.locator('#mention-menu').getByRole('button',{name:'独立阅读文档',exact:true}).click();
@@ -127,8 +127,7 @@ test('enabled autonomous vision does not force a frame when planning returns no 
     const fetched=await command({type:'provider.fetch',expectedRevision:1});
     expect((await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['local-vision']})).ok).toBe(true);
     await page.reload();await site.bringToFront();
-    await page.getByRole('button',{name:'切换当前内容'}).click();
-    await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+    await startNewChat(page);
     {const current=(await command({type:'workspace.query'})).view;fixture.workspaceId=current.workspaceId;fixture.chatId=current.chatId;}
     await page.getByRole('button',{name:'更多输入操作'}).click();
     await page.getByRole('button',{name:/^开启自主识别画面/}).click();

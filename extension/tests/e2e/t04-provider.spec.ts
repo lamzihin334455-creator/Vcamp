@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import { chromium, expect, test } from '@playwright/test';
 import { resolve } from 'node:path';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -41,7 +42,7 @@ test('T04 D: installed settings, restricted credentials, model selection and reo
     await page.getByLabel('输入草稿').fill('模型切换后保留文字');
     await selectModel('Synthetic B');
     await expect.poll(async()=>{const v=await query();return {text:v.draft.text,modelId:v.draft.modelId};}).toEqual({text:'模型切换后保留文字',modelId:'synthetic-b'});
-    await page.getByRole('button',{name:'切换当前内容',exact:true}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+    await startNewChat(page);
     await expect.poll(async()=>(await query()).draft.modelId).toBe('synthetic-b');
     await page.getByRole('button',{name:'切换当前内容',exact:true}).click();await page.getByRole('menuitem',{name:firstTitle,exact:true}).click();
     await expect.poll(async()=>(await query()).draft.modelId).toBe('synthetic-b');

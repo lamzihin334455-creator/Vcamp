@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import { expect, test } from '@playwright/test';
 import { installedPanel } from './fix-support';
 import { setup } from './interaction-fixture';
@@ -9,8 +10,7 @@ for (const mode of ['test-extension', 'production'] as const) test(`${mode}: Bai
     await page.setViewportSize({ width: 360, height: 800 });
     if (mode === 'production') {
       const old = (await command({ type: 'workspace.query' })).view.chatId;
-      await page.getByRole('button', { name: '切换当前内容', exact: true }).click();
-      await page.getByRole('menuitem', { name: '新对话', exact: true }).click();
+      await startNewChat(page);
       await expect.poll(async () => (await command({ type: 'workspace.query' })).view.chatId).not.toBe(old);
       await page.reload(); await expect(page.getByTestId('startup')).toHaveCount(0);
     }

@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {expect,test} from '@playwright/test';
 import {setup} from './interaction-fixture';
 
@@ -28,7 +29,7 @@ for(const captionless of [false,true])test(`installed production pipeline comple
     expect((await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['deepseek-flash']})).ok).toBe(true);
     await page.reload();await site.bringToFront();
     if(captionless){await site.goto('https://www.bilibili.com/video/BVnosub/');await site.bringToFront();await expect(page.locator('.context-current-button')).toContainText('无字幕视觉样本');}
-    await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+    await startNewChat(page);
     await page.getByRole('button',{name:'联网',exact:true}).click();
     if(captionless){await page.getByRole('button',{name:'更多输入操作'}).click();await page.getByRole('button',{name:/^开启自主识别画面/}).click();}
     const current=(await command({type:'workspace.query'})).view,target={kind:'chat',workspaceId:current.workspaceId,chatId:current.chatId};

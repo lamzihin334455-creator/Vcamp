@@ -1,3 +1,4 @@
+import {startNewChat} from './workbench-actions';
 import {expect,test} from '@playwright/test';
 import {setup} from './interaction-fixture';
 
@@ -34,7 +35,7 @@ for(const variant of ['deepseek','bailian','bailian-qwen'] as const)test(`produc
     await page.reload();await expect(page.getByTestId('startup')).toHaveCount(0);await site.bringToFront();
     for(const output of ['chat','markdown','html'] as const){
       const old=(await command({type:'workspace.query'})).view.chatId;
-      await page.getByRole('button',{name:'切换当前内容',exact:true}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+      await startNewChat(page);
       await expect.poll(async()=>(await command({type:'workspace.query'})).view.chatId).not.toBe(old);
       if(output!=='chat'){
         await page.getByRole('button',{name:/^产物类型：/}).click();await page.getByRole('menuitemradio',{name:output==='markdown'?'Markdown 笔记':'HTML 页面',exact:true}).click();
