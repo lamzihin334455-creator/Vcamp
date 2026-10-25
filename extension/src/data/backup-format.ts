@@ -13,7 +13,7 @@ import { ApplicationError, draftSchema, videoKeySchema } from '../contracts/appl
 import { messageSchema, targetSchema, generationErrors, jobStateSchema } from '../contracts/generation';
 import { referenceSnapshotSchema } from '../contracts/artifact';
 import { roleSchema, roleRevisionSchema } from '../contracts/role';
-import { presetRoles, presetRoleRevisions } from '../workbench/role-presets';
+import { presetRoleRevisions } from '../workbench/role-presets';
 import { templateSchema, templateRevisionSchema } from '../contracts/template';
 import { subtitleVersionSchema, analysisSourceSchema } from '../contracts/subtitles';
 import { scribbleSchema } from '../contracts/scribble';
@@ -111,16 +111,16 @@ export function project(raw: Record<string, unknown[]>,preferences?:PortablePref
     if (job.snapshot.roleSnapshot) roleDependencies.add(job.snapshot.roleSnapshot.revisionId);
     for (const h of job.snapshot.historyProjection) if (h.roleSnapshot) roleDependencies.add(h.roleSnapshot.revisionId);
   }
-  for (const preset of presetRoles) {
-    const required = presetRoleRevisions.filter(revision => revision.roleId === preset.id && roleDependencies.has(revision.revisionId));
-    const existing = payload.roles.find(row => row.id === preset.id);
+  for (const id of new Set(presetRoleRevisions.map(row => row.roleId))) {
+    const required = presetRoleRevisions.filter(revision => revision.roleId === id && roleDependencies.has(revision.revisionId));
+    const existing = payload.roles.find(row => row.id === id);
     if (!required.length && !existing) continue;
     const latest = existing ?? required.reduce((a, b) => a.revision > b.revision ? a : b);
     if (!existing) {
       const { roleId, ...fields } = latest as typeof required[number];
       payload.roles.push({ ...fields, id: roleId, builtin: true });
     }
-    payload.roleRevisions.push(...presetRoleRevisions.filter(r => r.roleId === preset.id && (r.revision <= latest.revision || roleDependencies.has(r.revisionId))
+    payload.roleRevisions.push(...presetRoleRevisions.filter(r => r.roleId === id && (r.revision <= latest.revision || roleDependencies.has(r.revisionId))
       && !payload.roleRevisions.some(saved => saved.revisionId === r.revisionId
         || saved.roleId === r.roleId && saved.revision === r.revision && !roleDependencies.has(r.revisionId))));
   }

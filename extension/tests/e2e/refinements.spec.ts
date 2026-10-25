@@ -24,7 +24,7 @@ test('style manager, global input menu, immediate send and isolated preference r
   await page.reload();await site.bringToFront();
   const configured=await command({type:'provider.query'});await command({type:'provider.default',expectedRevision:configured.view.provider.revision,modelId:'local-alternate'});await expect.poll(async()=>(await command({type:'workspace.query'})).view.draft.modelId).toBe('local-alternate');
   await page.getByRole('button',{name:'设置',exact:true}).click();await page.getByRole('button',{name:/角色设置/}).click();
-  const scope=page.getByRole('checkbox',{name:'将角色应用到所有产物',exact:true});await expect(scope).not.toBeChecked();await scope.check();await expect(scope).toBeChecked();
+  const scope=page.getByRole('switch',{name:'将当前角色应用到所有产物',exact:true});await expect(scope).toHaveAttribute('aria-checked','false');await scope.click();await expect(scope).toHaveAttribute('aria-checked','true');
   await page.getByRole('button',{name:/^返回/}).click();
   await page.getByRole('button',{name:'设置',exact:true}).click();await page.getByRole('button',{name:'模板工作流',exact:true}).click();
   await page.getByRole('button',{name:'风格管理',exact:true}).click();await page.getByRole('button',{name:'新建风格',exact:true}).click();
@@ -34,9 +34,9 @@ test('style manager, global input menu, immediate send and isolated preference r
   await expect(manager.getByRole('status')).toContainText('风格已保存');
   await page.getByRole('button',{name:'返回风格列表',exact:true}).click();await page.getByRole('button',{name:/^返回问答/}).click();
   const input=page.getByLabel('输入草稿');
-  await input.fill('!');const tools=page.locator('#mention-menu');await expect(tools).toContainText('截取当前画面');await expect(tools).not.toContainText('知识笔记');
+  await input.fill('!');const tools=page.locator('#mention-menu');await expect(tools).toContainText('截取当前画面');await expect(tools).not.toContainText('独立阅读文档');
   await tools.getByRole('button',{name:/^写随笔/}).click();await expect(page.getByRole('button',{name:'取消随笔'})).toBeVisible();await page.getByRole('button',{name:'取消随笔'}).click();
-  await page.getByRole('button',{name:'更多输入操作'}).click();await expect(tools).toContainText('截取当前画面');await expect(tools).toContainText('知识笔记');await input.click();await input.fill('生成一页学习材料');
+  await page.getByRole('button',{name:'更多输入操作'}).click();await expect(tools).toContainText('截取当前画面');await expect(tools).toContainText('独立阅读文档');await input.click();await input.fill('生成一页学习材料');
   await expect(page.locator('.model-pill')).toHaveCount(0);
   await page.getByRole('button',{name:'产物类型：Chat'}).click();await page.getByRole('menuitemradio',{name:'HTML 页面',exact:true}).click();
   const styleMenu=page.getByRole('menu',{name:'HTML 页面风格'});await expect(styleMenu).toHaveCount(0);await page.getByRole('button',{name:/^HTML 风格：/}).click();await expect(styleMenu).toBeVisible();await styleMenu.getByRole('menuitemradio',{name:'自定义纸张',exact:true}).click();

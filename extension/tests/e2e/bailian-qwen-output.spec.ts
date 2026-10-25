@@ -19,7 +19,7 @@ test('Bailian Qwen template HTML: report genuine truncation, never save fragment
         const html='<!doctype html><html><head><title>千问完整学习页</title></head><body><h1>千问完整学习页</h1><p>知识结构与交互练习</p><!--'+'完整资料依据。'.repeat(16000)+'--><button onclick="this.textContent=\'已展开\'">展开解释</button></body></html>';
         state.qwenExpected=html;
         const truncate=!planning&&(state.qwenTruncate||body.max_tokens<32768);
-        const text=planning?JSON.stringify({version:1,interpretedIntent:'生成交互学习页',additionalSources:[],outputRequirements:[]}):truncate?html.slice(0,18709):html;
+        const text=planning?JSON.stringify({version:1,interpretedIntent:'生成风格化交互页面',additionalSources:[],outputRequirements:[]}):truncate?html.slice(0,18709):html;
         return new Response(`data: ${JSON.stringify({choices:[{delta:{content:text},finish_reason:truncate?'length':'stop'}]})}\n\ndata: ${JSON.stringify({choices:[],usage:{prompt_tokens:2000,completion_tokens:truncate?8192:35000,total_tokens:truncate?10192:37000,completion_tokens_details:{reasoning_tokens:0}}})}\n\ndata: [DONE]\n\n`,{headers:{'content-type':'text/event-stream'}});
       };
     });
@@ -30,10 +30,10 @@ test('Bailian Qwen template HTML: report genuine truncation, never save fragment
     await command({type:'provider.import-models',modelIds:['qwen3.8-flash'],expectedRevision:provider.revision});
     await page.reload();await expect(page.getByTestId('startup')).toHaveCount(0);
     await page.getByRole('button',{name:'切换当前内容',exact:true}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
-    await page.getByLabel('输入草稿',{exact:true}).fill('@交互学习页');
-    await page.locator('#mention-menu').getByRole('button',{name:'交互学习页',exact:true}).click();
-    await expect(page.getByRole('button',{name:'移除任务模板 交互学习页',exact:true})).toBeVisible();
-    await page.getByLabel('输入草稿',{exact:true}).fill('生成完整的交互学习页');await site.bringToFront();
+    await page.getByLabel('输入草稿',{exact:true}).fill('@风格化交互页面');
+    await page.locator('#mention-menu').getByRole('button',{name:'风格化交互页面',exact:true}).click();
+    await expect(page.getByRole('button',{name:'移除任务模板 风格化交互页面',exact:true})).toBeVisible();
+    await page.getByLabel('输入草稿',{exact:true}).fill('生成完整的风格化交互页面');await site.bringToFront();
     const workspace=(await command({type:'workspace.query'})).view,target={kind:'chat',workspaceId:workspace.workspaceId,chatId:workspace.chatId};
     const query=async()=>(await command({type:'generation.query',target})).view.generation.jobs.at(-1);
     const artifacts=async()=>(await command({type:'knowledge.query',workspaceId:workspace.workspaceId})).view.knowledge.artifacts.filter((a:any)=>a.sourceChatId===workspace.chatId);
@@ -57,7 +57,7 @@ test('Bailian Qwen template HTML: report genuine truncation, never save fragment
     for(const {body} of calls){
       expect(body.max_tokens).toBe(131072);expect(body.enable_thinking).toBe(false);expect(body.stream_options.include_usage).toBe(true);
       expect(body.reasoning_effort).toBeUndefined();expect(body.thinking_budget).toBeUndefined();
-      expect(JSON.stringify(body.messages)).toContain('生成完整的交互学习页');expect(JSON.stringify(body.messages)).toContain('P2 当前任务模板');
+      expect(JSON.stringify(body.messages)).toContain('生成完整的风格化交互页面');expect(JSON.stringify(body.messages)).toContain('P2 当前任务模板');
       expect(JSON.stringify(body.messages)).not.toContain('这条新草稿不应进入原请求重试');
       expect(body.messages[0].content).not.toMatch(/131072|本次输出上限/);
     }

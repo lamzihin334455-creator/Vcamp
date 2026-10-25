@@ -43,7 +43,7 @@ test('HTML generation policy keeps only format, readability and sandbox boundari
   expect(htmlInstructions).toContain('不换算链接目标');
   expect(htmlInstructions).not.toMatch(/4000–8000|统一视觉风格|按问题选择有价值的展开|测验|比较、筛选|区分视频依据、补充解释和推断/);
   const preset=presetTemplates.find(template=>template.id==='builtin-map')!;
-  expect(preset).toMatchObject({revision:5,revisionId:'builtin-map:v5',outputProtocol:'html-page-v1'});
+  expect(preset).toMatchObject({revision:9,revisionId:'22b9ba8d-3fe5-49e4-9ba7-2c143000fa70',outputProtocol:'html-page-v1'});
   expect(preset.requirements).not.toMatch(/风格统一|包含适合此主题的页内交互|区分视频依据与补充解释/);
 });
 test('HTML SSE tolerates token-sized event overhead above 1 MiB, with finite non-JSON output policy',async()=>{

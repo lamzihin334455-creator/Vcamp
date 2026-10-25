@@ -29,8 +29,8 @@ for(const variant of ['shared','distinct'] as const)test(`valid ${variant} eight
   await expect(page.locator('.context-current-button .sr-only')).toHaveText('完整字幕已就绪');
   await expect(page.getByTestId('startup')).toHaveCount(0);
   await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
-  await page.getByLabel('输入草稿').fill('@知识笔记');
-  await page.locator('#mention-menu').getByRole('button',{name:'知识笔记',exact:true}).click();
+  await page.getByLabel('输入草稿').fill('@独立阅读文档');
+  await page.locator('#mention-menu').getByRole('button',{name:'独立阅读文档',exact:true}).click();
   await page.getByRole('button',{name:'更多输入操作'}).click();await page.getByRole('button',{name:/^开启自主识别画面/}).click();
   const space=(await command({type:'workspace.query'})).view;fixture.workspaceId=space.workspaceId;fixture.chatId=space.chatId;
   const target={kind:'chat',workspaceId:space.workspaceId,chatId:space.chatId};

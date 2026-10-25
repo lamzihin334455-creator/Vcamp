@@ -1,3 +1,5 @@
+import { approvedTemplateHistory } from './approved-preset-history';
+import { approvedTemplates } from './approved-defaults';
 import type { Template, TemplateRevision } from '../contracts/template';
 
 // Reviewed prototype names/descriptions, with production requirements narrowed
@@ -12,8 +14,9 @@ const htmlPresets: readonly Template[] = knowledgePresets.map(t=>t.id==='builtin
 const flexiblePresets: readonly Template[] = htmlPresets.map(t=>t.id==='builtin-map'?{...t,revision:4,revisionId:'builtin-map:v4',description:'根据本次要求生成 HTML 页面',requirements:'根据本次要求与视频资料生成自包含 HTML 页面；内容结构、表现方式和页内交互由模型按任务需要决定。'}:t.id==='builtin-summary'?{...t,revision:2,revisionId:'builtin-summary:v2',requirements:'概括当前视频的核心内容与主要观点，帮助用户快速理解。按内容选择合适结构，不固定要点数量或额外栏目。表达详略和时间呈现遵循当前角色及本次要求。'}:{...t,revision:2,revisionId:'builtin-note:v2',description:'整理便于理解与回顾的知识笔记',requirements:'用 Markdown 整理便于理解与回顾的视频笔记，呈现重要概念、关系与结论；按内容选择结构，不强行补齐章节或行动建议。表达详略和时间呈现遵循当前角色及本次要求。'});
 const evidenceGuidance='准确区分视频陈述、作者观点、观众评论与补充推断；局部演示成功不等于普遍结论。资料不足时保留关键缺口，不用标题或少量静帧补写全片内容。';
 const evidencePresets: readonly Template[] = flexiblePresets.map(t=>({...t,revision:t.revision+1,revisionId:`${t.id}:v${t.revision+1}`,requirements:t.requirements+' '+evidenceGuidance+(t.id==='builtin-summary'?' 默认先给核心结论，再用少量紧凑段落或要点解释；未要求详细时以约200至400字为宜，不逐段复述或罗列非核心推广信息。本次明确要求优先。':t.id==='builtin-note'?' 优先记录可复用的概念、依据和适用条件，合并重复论点；案例服务于理解，不把口述观点改写成已验证事实。':' 交互须服务理解且实际可操作，提供清楚的操作标签和状态反馈；窄栏可读，不依赖外部资源，不把猜测做成确定答案。')}));
-export const presetTemplates: readonly Template[] = evidencePresets.map(t=>t.id==='builtin-summary'?{...t,revision:4,revisionId:'builtin-summary:v4',requirements:t.requirements.replace(' 默认先给核心结论，再用少量紧凑段落或要点解释；未要求详细时以约200至400字为宜，不逐段复述或罗列非核心推广信息。本次明确要求优先。',' 默认只给一句核心结论和少量短要点，每点一句话；全文目标200至300字，不超过400字（含标题、标点和时间标签，不计链接地址）。不另加重复栏目，不逐段复述或罗列非核心推广信息。本次明确要求或角色要求详细时按其展开。')}:t);
-const versionHistory: readonly TemplateRevision[] = [...initialPresets,...knowledgePresets.filter(t=>t.revision===2),...htmlPresets.filter(t=>t.revision===3),...flexiblePresets,...evidencePresets,...presetTemplates].map(({ id, builtin: _builtin, ...fields }) => ({ templateId: id, ...fields }));
+const previousTemplates: readonly Template[] = evidencePresets.map(t=>t.id==='builtin-summary'?{...t,revision:4,revisionId:'builtin-summary:v4',requirements:t.requirements.replace(' 默认先给核心结论，再用少量紧凑段落或要点解释；未要求详细时以约200至400字为宜，不逐段复述或罗列非核心推广信息。本次明确要求优先。',' 默认只给一句核心结论和少量短要点，每点一句话；全文目标200至300字，不超过400字（含标题、标点和时间标签，不计链接地址）。不另加重复栏目，不逐段复述或罗列非核心推广信息。本次明确要求或角色要求详细时按其展开。')}:t);
+export const presetTemplates = approvedTemplates;
+const versionHistory: readonly TemplateRevision[] = [...initialPresets,...knowledgePresets.filter(t=>t.revision===2),...htmlPresets.filter(t=>t.revision===3),...flexiblePresets,...evidencePresets,...previousTemplates].map(({ id, builtin: _builtin, ...fields }) => ({ templateId: id, ...fields }));
 // Unchanged presets can occur in adjacent release sets; each version is one dependency.
-export const presetRevisions: readonly TemplateRevision[] = [...new Map(versionHistory.map(revision => [revision.revisionId, revision])).values()];
+export const presetRevisions: readonly TemplateRevision[] = [...new Map([...versionHistory,...approvedTemplateHistory].map(revision => [revision.revisionId, revision])).values()];
 export const resolveTemplateRevision = (templateId: string, revisionId: string, revisions: readonly TemplateRevision[]) => [...presetRevisions, ...revisions].find(row => row.templateId === templateId && row.revisionId === revisionId);

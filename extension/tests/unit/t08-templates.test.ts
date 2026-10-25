@@ -41,7 +41,7 @@ test('builtin output is enforced at freeze; current HTML is explicit and legacy 
   await spaces.save(a.id, 1, { ...draft, outputType: 'html' });
   const knowledge = await tasks.freezeChat(target, 2, basis);
   expect(knowledge.snapshot).toMatchObject({outputType:'html',htmlFormat:1,templateRevisionId:preset.revisionId});
-  expect((await tasks.view(target)).messages[0]).toMatchObject({role:'user',text:'',templateSnapshot:{name:'交互学习页',outputType:'html'}});
+  expect((await tasks.view(target)).messages[0]).toMatchObject({role:'user',text:'',templateSnapshot:{name:'风格化交互页面',outputType:'html'}});
   await tasks.finish(knowledge.jobId,knowledge.attempts[0].attemptId,'stopped');
   draft = (await spaces.read(a.id))!.draft;
   await spaces.save(a.id, draft.revision, { ...draft, template: { templateId: 'forged', revisionId: preset.revisionId } });

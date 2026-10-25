@@ -53,7 +53,7 @@ for (const withTemplate of [false, true]) test(`actual send action template=${wi
         if (!init?.method || init.method === 'GET') return new Response(JSON.stringify({object: 'list', data: [{id: 'local-fixture', input_modalities: ['text']}]}), {headers: {'content-type': 'application/json'}});
         const request = JSON.parse(init.body), system = String(request.messages[0].content);
         const planning = system.includes('[P1:requirements-plan]');
-        let content = JSON.stringify({version: 1, interpretedIntent: '生成交互学习页', additionalSources: [], outputRequirements: []});
+        let content = JSON.stringify({version: 1, interpretedIntent: '生成风格化交互页面', additionalSources: [], outputRequirements: []});
         if (!planning) {
           (globalThis as any).htmlRequests.push({maxTokens: request.max_tokens,
             hasTemplate: JSON.stringify(request.messages).includes('P2 当前任务模板'),
@@ -82,14 +82,14 @@ for (const withTemplate of [false, true]) test(`actual send action template=${wi
       await page.getByRole('menuitem', {name: '新对话', exact: true}).click();
       await expect(page.locator('.context-module')).toHaveText('对话 02');
       if (withTemplate) {
-        await page.getByLabel('输入草稿').fill('@交互学习页');
-        await page.locator('#mention-menu').getByRole('button', {name: '交互学习页', exact: true}).click();
-        await expect(page.getByRole('button', {name: '移除任务模板 交互学习页', exact: true})).toBeVisible();
+        await page.getByLabel('输入草稿').fill('@风格化交互页面');
+        await page.locator('#mention-menu').getByRole('button', {name: '风格化交互页面', exact: true}).click();
+        await expect(page.getByRole('button', {name: '移除任务模板 风格化交互页面', exact: true})).toBeVisible();
       } else {
         await page.getByRole('button', {name: /产物类型/}).click();
         await page.getByRole('menuitemradio', {name: /HTML/}).click();
       }
-      await page.getByLabel('输入草稿').fill('生成完整交互学习页');
+      await page.getByLabel('输入草稿').fill('生成完整风格化交互页面');
       const workspace = (await command({type: 'workspace.query'})).view;
       await page.getByRole('button', {name: '发送', exact: true}).click();
       const query = async () => (await command({type: 'generation.query', target: {kind: 'chat', workspaceId: workspace.workspaceId, chatId: workspace.chatId}})).view.generation.jobs.at(-1);

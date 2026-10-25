@@ -6,10 +6,10 @@ test('pinyin mention search and Enter select the first matching module',async()=
   try{
     await site.bringToFront();await page.bringToFront();
     const input=page.getByLabel('输入草稿');
-    await input.fill('@zhishibiji');
-    await expect(page.locator('#mention-menu').getByRole('button',{name:/知识笔记/})).toBeVisible();
+    await input.fill('@duliyueduwendang');
+    await expect(page.locator('#mention-menu').getByRole('button',{name:/独立阅读文档/})).toBeVisible();
     await input.press('Enter');
-    await expect(page.getByRole('button',{name:'移除任务模板 知识笔记',exact:true})).toBeVisible();
+    await expect(page.getByRole('button',{name:'移除任务模板 独立阅读文档',exact:true})).toBeVisible();
     await expect(input).toHaveValue('');
     await expect(input).toBeEditable();
   }finally{await context.close();}

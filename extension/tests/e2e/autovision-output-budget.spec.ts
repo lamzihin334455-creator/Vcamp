@@ -8,7 +8,7 @@ for(const output of ['markdown','html'] as const)test(`autonomous ${output} pres
  try{
   await worker.evaluate(output=>{
    const original=fetch;(globalThis as any).budgetCalls=[];(globalThis as any).budgetFinalMode='length';
-   (globalThis as any).expectedOutput=output==='markdown'?'# 扩容后的知识笔记\n\n'+('完整画面与字幕依据。\n'.repeat(4000)):'<!doctype html><html><head><title>扩容后的学习页</title></head><body><h1>扩容后的学习页</h1><button onclick="this.textContent=\'已展开\'">展开</button>'+('<p>完整画面与字幕依据。</p>'.repeat(5000))+'</body></html>';
+   (globalThis as any).expectedOutput=output==='markdown'?'# 扩容后的独立阅读文档\n\n'+('完整画面与字幕依据。\n'.repeat(4000)):'<!doctype html><html><head><title>扩容后的学习页</title></head><body><h1>扩容后的学习页</h1><button onclick="this.textContent=\'已展开\'">展开</button>'+('<p>完整画面与字幕依据。</p>'.repeat(5000))+'</body></html>';
    globalThis.fetch=(async(input:any,init:any)=>{
     if(!String(input).startsWith('https://api.deepseek.com/'))return original(input,init);
     if(!init?.method||init.method==='GET')return Response.json({object:'list',data:[{id:'local-vision',input_modalities:['text','image']}]});
@@ -32,8 +32,8 @@ for(const output of ['markdown','html'] as const)test(`autonomous ${output} pres
   const previousChat=(await command({type:'workspace.query'})).view.chatId;
   await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
   await expect.poll(async()=>(await command({type:'workspace.query'})).view.chatId).not.toBe(previousChat);
-  await page.getByLabel('输入草稿').fill(output==='markdown'?'@知识笔记':'@交互学习页');
-  await page.locator('#mention-menu').getByRole('button',{name:output==='markdown'?'知识笔记':'交互学习页',exact:true}).click();
+  await page.getByLabel('输入草稿').fill(output==='markdown'?'@独立阅读文档':'@风格化交互页面');
+  await page.locator('#mention-menu').getByRole('button',{name:output==='markdown'?'独立阅读文档':'风格化交互页面',exact:true}).click();
   await page.getByRole('button',{name:'更多输入操作'}).click();await page.getByRole('button',{name:/^开启自主识别画面/}).click();
   const space=(await command({type:'workspace.query'})).view;fixture.workspaceId=space.workspaceId;fixture.chatId=space.chatId;
   const target={kind:'chat',workspaceId:space.workspaceId,chatId:space.chatId};
@@ -60,7 +60,7 @@ for(const output of ['markdown','html'] as const)test(`autonomous ${output} pres
   if(output==='html'){
    const content=page.frameLocator('.html-page-frame').frameLocator('iframe');
    await content.getByRole('button',{name:'展开',exact:true}).click();await expect(content.getByRole('button',{name:'已展开',exact:true})).toBeVisible();
-  }else await expect(page.getByRole('heading',{name:'扩容后的知识笔记',exact:true})).toBeVisible();
+  }else await expect(page.getByRole('heading',{name:'扩容后的独立阅读文档',exact:true})).toBeVisible();
   await page.screenshot({path:test.info().outputPath('expanded-budget.png')});
   await page.reload();await expect(page.getByRole('button',{name:'切换当前内容'})).toBeVisible();
   expect((await listing())[0][output==='markdown'?'content':'source']).toBe(await worker.evaluate(()=>(globalThis as any).expectedOutput));

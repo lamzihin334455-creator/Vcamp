@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
+import { Globe2, FileText } from 'lucide-react';
 import type { ApplicationClient, Draft } from '../contracts/application';
 import type { PromptRole, RoleFields, RoleRevision } from '../contracts/role';
 import { nextCopyName } from './prompt-name';
@@ -25,6 +26,7 @@ export function useRoles(client: ApplicationClient, selected?: Draft['role'], en
 
 const blank: RoleFields = { name: '', description: '', instructions: '' };
 export function RoleManager({ client, registerLeaveGuard }: { client: ApplicationClient; registerLeaveGuard?: RegisterPromptLeaveGuard }) {
+  const scopeId = useId();
   const { roles, error: loadError } = useRoles(client);
   const [allOutputs,setAllOutputs]=useState(false),[scopeReady,setScopeReady]=useState(false),[scopeBusy,setScopeBusy]=useState(false),[scopeError,setScopeError]=useState('');
   useEffect(()=>{let alive=true;void (client.roleOutputPreferences?.read()??Promise.resolve(false)).then(value=>{if(alive){setAllOutputs(value);setScopeReady(true);}},()=>{if(alive)setScopeError('角色应用范围读取失败，请重试。');});return()=>{alive=false;};},[client]);
@@ -61,8 +63,16 @@ export function RoleManager({ client, registerLeaveGuard }: { client: Applicatio
   return <section className="template-manager prompt-manager" aria-label="角色管理">
     <div className="prompt-heading"><h3>{editorOpen ? editing ? `编辑角色 · ${editing.name}` : '新建角色' : '角色管理'}</h3>{editorOpen && <button disabled={busy} onClick={() => void backToList()}>返回角色列表</button>}</div>
     {loadError && <p role="alert">{loadError}</p>}
-    <div className="role-output-scope"><label><input type="checkbox" checked={allOutputs} disabled={!scopeReady||scopeBusy||!client.roleOutputPreferences} onChange={event=>void changeScope(event.target.checked)}/>将角色应用到所有产物</label><small>默认仅用于问答。开启后，笔记和 HTML 页面也使用当前角色的表达偏好；已发送的请求保持原设置。</small>{scopeError&&<p role="alert">{scopeError}</p>}</div>
-    {!editorOpen ? <><p className="prompt-intro">用角色设置语气、叙事方式、回答详略，以及时间点的显示频率和形式。点击角色即可编辑。</p><div className="prompt-actions"><button onClick={() => begin()}>新建角色</button></div>
+    {!editorOpen ? <><section className="role-scope-card" aria-label="应用范围">
+      <h4><Globe2 size={18} aria-hidden="true"/>应用范围</h4>
+      <div className="role-scope-control">
+        <div className="settings-toggle-row"><strong id={`${scopeId}-label`}>将当前角色应用到所有产物</strong><button className="toggle-switch" role="switch" aria-labelledby={`${scopeId}-label`} aria-describedby={`${scopeId}-description`} aria-checked={allOutputs} aria-busy={scopeBusy} disabled={!scopeReady||scopeBusy||!client.roleOutputPreferences} onClick={()=>void changeScope(!allOutputs)}><i/></button></div>
+        <p id={`${scopeId}-description`}>关闭时仅用于问答；开启后，笔记和 HTML 页面也使用当前角色的表达偏好。已发送的请求保持原设置。</p>
+      </div>
+      {scopeError&&<p role="alert">{scopeError}</p>}
+    </section>
+    <section className="role-description-card" aria-label="角色说明"><h4><FileText size={18} aria-hidden="true"/>角色说明</h4><p>设置回答的详略与侧重点，也可自定义角色身份和表达风格。</p></section>
+    <div className="prompt-actions"><button onClick={() => begin()}>新建角色</button></div>
     <div className="template-list prompt-list">{roles.map(role => <button key={role.id} aria-label={role.name} onClick={() => begin(role)}><span className="prompt-list-title"><strong>{role.name}</strong></span><span className="prompt-list-description">{role.description || '点击编辑表达方式与角色指令'}</span></button>)}</div>
     <details className="prompt-details"><summary>角色如何生效</summary><p>角色管理表达偏好，模板定义任务目标。本次明确要求优先；未填写的偏好由模型按任务决定。保存后，从侧栏设置重新选择角色生效；历史请求保留原版本。</p></details>{status && <p role="status">{status}</p>}</> :
     <form className="prompt-editor" onSubmit={event => { event.preventDefault(); void save(); }}>

@@ -20,7 +20,7 @@ test('saved role preferences display their frozen name after preset upgrade, edi
     const oldPreset = { roleId: 'role-professor', revisionId: 'role-professor:v1' };
     const presets = await command({ type: 'role.query', selected: oldPreset });
     expect(presets.ok).toBe(true);
-    expect(presets.view.roles.roles.find((role: any) => role.id === oldPreset.roleId).revisionId).toBe('role-professor:v2');
+    expect(presets.view.roles.roles.find((role: any) => role.id === oldPreset.roleId).name).toBe('简洁直接');
     await chooseSavedPreference(oldPreset);
     await expect(page.getByRole('button',{name:'当前角色',exact:true})).toHaveText('老教授（历史版本）');
     await expectFrozenPreference(oldPreset);

@@ -43,13 +43,13 @@ test('roles live in settings, templates carry data policy, and both freeze into 
     await webSwitch.click();
     await expect(webSwitch).toHaveAttribute('aria-checked','false');
     await page.getByRole('button', { name: /角色设置/ }).click();
-    await page.getByRole('checkbox',{name:'将角色应用到所有产物',exact:true}).check();
-    await page.getByRole('button', { name: '老教授', exact: true }).click();
+    await page.getByRole('switch',{name:'将当前角色应用到所有产物',exact:true}).click();
+    await page.getByRole('button', { name: '简洁直接', exact: true }).click();
     await page.getByLabel('角色指令', { exact: true }).fill('ROLE_E2E 用耐心的教授口吻详细解释，每章末尾附一处时间区间');
     await page.getByRole('button', { name: '保存角色', exact: true }).click();
     await expect(page.locator('.template-manager').getByRole('status')).toContainText('角色已保存');
     await page.getByRole('button', { name: '复制角色', exact: true }).click();
-    await expect(page.getByLabel('角色名称', { exact: true })).toHaveValue('老教授 V2');
+    await expect(page.getByLabel('角色名称', { exact: true })).toHaveValue('简洁直接 V2');
     await page.getByLabel('角色名称', { exact: true }).fill('临时角色副本');
     await page.getByRole('button', { name: '创建角色', exact: true }).click();
     await page.getByRole('button', { name: '删除角色', exact: true }).click();
@@ -59,17 +59,17 @@ test('roles live in settings, templates carry data policy, and both freeze into 
 
     await page.getByRole('button', { name: '设置', exact: true }).click();
     await page.getByRole('button', { name: '当前角色', exact: true }).click();
-    await page.getByRole('option', { name: /^老教授/ }).click();
-    await expect(page.getByRole('button', { name: '当前角色', exact: true })).toContainText('老教授');
+    await page.getByRole('option', { name: /^简洁直接/ }).click();
+    await expect(page.getByRole('button', { name: '当前角色', exact: true })).toContainText('简洁直接');
     await page.getByRole('button', { name: '模板工作流', exact: true }).click();
-    await page.getByRole('button', { name: /知识笔记 · Markdown 笔记/ }).click();
+    await page.getByRole('button', { name: /独立阅读文档 · Markdown 笔记/ }).click();
     await page.getByLabel('模板要求', { exact: true }).fill('TASK_E2E 整理关键概念与复习问题');
     await page.locator('summary').filter({ hasText: '资料调用策略' }).click();
     await page.getByRole('switch', { name: '完整主字幕强制使用', exact: true }).check();
     await page.getByRole('button', { name: '保存模板', exact: true }).click();
     await expect(page.locator('.template-manager').getByRole('status')).toContainText('模板已保存');
     await page.getByRole('button', { name: '复制模板', exact: true }).click();
-    await expect(page.getByLabel('模板名称', { exact: true })).toHaveValue('知识笔记 V2');
+    await expect(page.getByLabel('模板名称', { exact: true })).toHaveValue('独立阅读文档 V2');
     await page.getByLabel('模板名称', { exact: true }).fill('临时模板副本');
     await page.getByRole('button', { name: '创建模板', exact: true }).click();
     await page.getByRole('button', { name: '删除模板', exact: true }).click();
@@ -77,13 +77,13 @@ test('roles live in settings, templates carry data policy, and both freeze into 
     await expect(page.locator('.template-manager').getByRole('status').filter({hasText:'模板已从列表删除'})).toContainText('模板已从列表删除');
     await page.getByRole('button', { name: /^返回/ }).click();
 
-    await page.getByLabel('输入草稿').fill('@知识笔记');
-    await page.locator('#mention-menu').getByRole('button', { name: '知识笔记', exact: true }).click();
-    await expect(page.getByRole('button', { name: '移除任务模板 知识笔记', exact: true })).toBeVisible();
-    await page.getByRole('button', { name: '移除任务模板 知识笔记', exact: true }).click();
-    await expect(page.getByRole('button', { name: '移除任务模板 知识笔记', exact: true })).toHaveCount(0);
-    await page.getByLabel('输入草稿').fill('@知识笔记');
-    await page.locator('#mention-menu').getByRole('button', { name: '知识笔记', exact: true }).click();
+    await page.getByLabel('输入草稿').fill('@独立阅读文档');
+    await page.locator('#mention-menu').getByRole('button', { name: '独立阅读文档', exact: true }).click();
+    await expect(page.getByRole('button', { name: '移除任务模板 独立阅读文档', exact: true })).toBeVisible();
+    await page.getByRole('button', { name: '移除任务模板 独立阅读文档', exact: true }).click();
+    await expect(page.getByRole('button', { name: '移除任务模板 独立阅读文档', exact: true })).toHaveCount(0);
+    await page.getByLabel('输入草稿').fill('@独立阅读文档');
+    await page.locator('#mention-menu').getByRole('button', { name: '独立阅读文档', exact: true }).click();
     await page.getByLabel('输入草稿').fill('CURRENT_E2E 请突出易混淆概念');
     await expect(page.getByLabel('输入区')).not.toContainText('角色：');
     await expect(page.getByLabel('输入区')).not.toContainText('模板要求');
@@ -107,8 +107,8 @@ test('roles live in settings, templates carry data policy, and both freeze into 
     await page.getByRole('button', { name: 'AI 指令', exact: true }).click();
     const inspector = page.getByRole('dialog', { name: '本次 AI 指令', exact: true });
     await expect(inspector).toContainText('实际调用记录 · 不会再次调用模型');
-    await expect(inspector).toContainText('P3 · 角色：老教授 · v3');
-    await expect(inspector).toContainText('P2 · 模板：知识笔记 · v4');
+    await expect(inspector).toContainText('P3 · 角色：简洁直接 · v5');
+    await expect(inspector).toContainText('P2 · 模板：独立阅读文档 · v6');
     await expect(inspector.getByLabel('选择调用阶段').locator('option')).toHaveCount(2);
     await inspector.getByText('展开请求 JSON', { exact: true }).click();
     const actual = inspector.locator('details').filter({ has: page.getByText('展开请求 JSON', { exact: true }) }).locator('pre');
@@ -118,7 +118,7 @@ test('roles live in settings, templates carry data policy, and both freeze into 
 
     await page.reload(); await site.bringToFront();
     await page.getByRole('button', { name: '设置', exact: true }).click();
-    await expect(page.getByRole('button', { name: '当前角色', exact: true })).toContainText('老教授');
+    await expect(page.getByRole('button', { name: '当前角色', exact: true })).toContainText('简洁直接');
     await page.getByRole('button', { name: '当前角色', exact: true }).click();
     await page.getByRole('option', { name: /^默认表达/ }).click();
     await expect(page.getByRole('button', { name: '当前角色', exact: true })).toContainText('默认表达');

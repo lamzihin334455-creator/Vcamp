@@ -11,6 +11,26 @@ import { IndexedTemplateStore } from '../../src/data/template-store';
 import { IndexedGenerationStore } from '../../src/data/generation-store';
 import { databaseTransaction } from '../../src/data/database';
 
+test('approved role catalog order and every current selection survive edits and backup restore', async () => {
+  const name = crypto.randomUUID(), roles = new IndexedRoleStore(name), spaces = new IndexedWorkspaceStore(name);
+  const catalog = await roles.list();
+  expect(catalog.map(role => role.name)).toEqual(['简洁直接', '标准', '深度分析', '通俗易懂']);
+  for (const role of catalog) {
+    const space = await spaces.open({ platform: 'bilibili', videoId: 'BVapproved', partId: role.id, title: role.name });
+    await spaces.save(space.id, 0, { ...space.draft, role: { roleId: role.id, revisionId: role.revisionId } });
+    await roles.save(role.id, role.revision, { name: role.name, description: role.description, instructions: 'Edited after selection' });
+    expect((await roles.revision(role.id, role.revisionId)).instructions).toBe(role.instructions);
+  }
+  const file = await new IndexedBackupStore(name).export(), destinationName = crypto.randomUUID();
+  const destination = new IndexedBackupStore(destinationName), plan = await destination.preview(file);
+  await destination.execute(plan.planId, plan.checksum);
+  const restored = (await decode(await destination.export())).payload;
+  for (const original of catalog) {
+    const draft = restored.workspaces.find(space => space.source.partId === original.id)!.chats[0].draft;
+    expect(restored.roleRevisions.find(role => role.revisionId === draft.role!.revisionId)?.instructions).toBe(original.instructions);
+  }
+});
+
 test('all builtin template selections export unique historical dependencies and restore into a fresh database', async () => {
   const name = crypto.randomUUID(), spaces = new IndexedWorkspaceStore(name);
   const selections = [...new Map(presetRevisions.map(revision => [revision.revisionId, revision])).values()];

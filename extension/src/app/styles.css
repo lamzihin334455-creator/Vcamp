@@ -260,6 +260,18 @@ dialog:has(.provider-settings) { max-height: calc(100dvh - 40px); overflow-y: au
 .prompt-heading h3{font-size:17px;line-height:1.5;overflow-wrap:anywhere;margin:0;min-width:0;max-height:4.5em;overflow:auto}
 .prompt-heading>button{flex:none;border-radius:8px;background:transparent;color:var(--accent-strong);padding:6px;font-size:12px}
 .prompt-intro{font-size:13px;line-height:1.7;color:#68746e;margin:0 0 16px}
+.role-scope-card,.role-description-card{border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px;min-width:0}
+.role-scope-card{background:var(--accent-soft)}
+.role-description-card{background:#f5f6f4}
+.role-scope-card h4,.role-description-card h4{display:flex;align-items:center;gap:9px;margin:0 0 12px;font-size:14px}
+.role-scope-card h4 svg{color:var(--accent-strong)}
+.role-description-card h4 svg{color:var(--muted)}
+.role-scope-control{border:1px solid var(--line);border-radius:11px;background:white;padding:12px}
+.role-scope-control .settings-toggle-row{padding:0;align-items:center;font-size:13px}
+.role-scope-control strong{min-width:0;line-height:1.6}
+.role-scope-control p,.role-description-card p{margin:9px 0 0;color:#68746e;font-size:12px;line-height:1.75;overflow-wrap:anywhere}
+.role-scope-control .toggle-switch:focus-visible{outline:2px solid var(--accent-strong);outline-offset:3px}
+.role-scope-control .toggle-switch:disabled{opacity:.5;cursor:wait}
 .prompt-list{gap:10px}.prompt-list>button{display:flex;flex-direction:column;align-items:stretch;gap:7px;text-align:left;padding:14px;background:white;border:1px solid var(--line);border-radius:12px}
 .prompt-list-title{display:flex;justify-content:space-between;align-items:baseline;gap:10px}.prompt-list-title strong{font-size:14px;overflow-wrap:anywhere}.prompt-list-title small{font-size:11px;color:#68746e;flex:none}
 .prompt-list-description{font-size:12px;line-height:1.65;color:#68746e;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}

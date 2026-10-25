@@ -49,11 +49,11 @@ test('builtin knowledge note carries its task into autonomous vision and stores 
         const kind=system.includes('[P1:requirements-plan]')?'requirements':system.includes('[P1:vision-plan]')?'vision':system.includes('[P1:vision-review]')?'review':system.includes('Markdown 笔记')?'markdown':'answer';
         (globalThis as any).autovisionRequests.push({kind,body});
         const content=kind==='requirements'
-          ?JSON.stringify({version:1,interpretedIntent:'按知识笔记模板整理章节、结论和关键时间点，并在确有必要时读取原视频画面',additionalSources:[],outputRequirements:['Markdown 笔记','关键时间点']})
+          ?JSON.stringify({version:1,interpretedIntent:'按独立阅读文档模板整理章节、结论和关键时间点，并在确有必要时读取原视频画面',additionalSources:[],outputRequirements:['Markdown 笔记','关键时间点']})
           :kind==='vision'
             ?JSON.stringify({version:3,scope:'focused',evidence:[{need:'读取关键时间点附近的实际画面',priority:'required',mode:'single',windows:[{cueIds:[0]}],detailNeed:'overview',readTargets:[],checkTargets:['画面主体'],reason:'按原字幕定位关键时间点'}],unresolved:[]})
             :kind==='review'?JSON.stringify({version:3,results:JSON.parse(body.messages[1].content[0].text).targets.map((t:any)=>({evidenceId:t.evidenceId,checks:t.checks.map((c:any)=>({checkId:c.checkId,status:'confirmed',imageRefs:t.imageRefs,observation:'本地模拟核验结果'})),refinements:[]}))})
-            :'# 自主识别知识笔记\n\n已结合 00:01 附近的实际画面完成整理。';
+            :'# 自主识别独立阅读文档\n\n已结合 00:01 附近的实际画面完成整理。';
         const data='data: '+JSON.stringify({choices:[{index:0,delta:{content},finish_reason:'stop'}]})+'\n\ndata: [DONE]\n\n';
         return new Response(data,{headers:{'content-type':'text/event-stream'}});
       }) as typeof fetch;
@@ -66,8 +66,8 @@ test('builtin knowledge note carries its task into autonomous vision and stores 
     await page.getByRole('button',{name:'切换当前内容'}).click();
     await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
     {const current=(await command({type:'workspace.query'})).view;fixture.workspaceId=current.workspaceId;fixture.chatId=current.chatId;}
-    await page.getByLabel('输入草稿').fill('@知识笔记');
-    await page.locator('#mention-menu').getByRole('button',{name:'知识笔记',exact:true}).click();
+    await page.getByLabel('输入草稿').fill('@独立阅读文档');
+    await page.locator('#mention-menu').getByRole('button',{name:'独立阅读文档',exact:true}).click();
     await expect(page.getByLabel('输入草稿')).toBeEditable();
     await page.getByRole('button',{name:'更多输入操作'}).click();
     await page.getByRole('button',{name:/^开启自主识别画面/}).click();
@@ -80,7 +80,7 @@ test('builtin knowledge note carries its task into autonomous vision and stores 
     const requests=await worker.evaluate(()=>(globalThis as any).autovisionRequests);
     expect(requests.map((request:any)=>request.kind)).toEqual(['requirements','vision','review','markdown']);
     const visionText=JSON.stringify(requests[1].body.messages);
-    expect(visionText).toContain('知识笔记');
+    expect(visionText).toContain('独立阅读文档');
     expect(visionText).toContain('关键时间点');
     expect(JSON.stringify(requests[2].body.messages)).toContain('image_url');
     const generation=await query(),job=generation.jobs.at(-1);
@@ -96,7 +96,7 @@ test('builtin knowledge note carries its task into autonomous vision and stores 
     await expect(page.getByRole('button',{name:'打开笔记',exact:true})).toBeVisible();
     const artifacts=(await command({type:'artifact.query',workspaceId:fixture.workspaceId,sourceChatId:fixture.chatId})).view.artifacts.artifacts;
     expect(artifacts).toHaveLength(1);
-    expect(artifacts[0]).toMatchObject({type:'markdown',title:'自主识别知识笔记'});
+    expect(artifacts[0]).toMatchObject({type:'markdown',title:'自主识别独立阅读文档'});
   }finally{await context.close();}
 });
 

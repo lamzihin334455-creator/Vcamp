@@ -56,5 +56,5 @@
   "optional_host_permissions": [
     "https://*/*"
   ],
-  "version_name": "1.0.0-rc.1"
+  "version_name": "1.0.0-rc.2"
 }
