@@ -1,4 +1,4 @@
-import {readFile,writeFile,mkdir,copyFile,readdir,rm} from 'node:fs/promises';
+import {readFile,writeFile,mkdir,readdir,rm} from 'node:fs/promises';
 import {resolve,dirname} from 'node:path';
 const lock=JSON.parse(await readFile('package-lock.json','utf8'));
 const rows=[];
@@ -9,7 +9,9 @@ for(const [path,info] of Object.entries(lock.packages)){
   if(!licenses.length)throw Error('Missing license: '+name);
   const destination=`third-party-licenses/${name.replace('@','').replaceAll('/','__')}-${info.version}`;
   await mkdir(resolve('..',destination),{recursive:true});
-  for(const file of licenses)await copyFile(resolve(path,file),resolve('..',destination,file));
+  // Match the repository's LF policy so regeneration stays clean after a fresh
+  // Windows checkout, including packages that publish license text with CRLF.
+  for(const file of licenses)await writeFile(resolve('..',destination,file),(await readFile(resolve(path,file),'utf8')).replaceAll('\r\n','\n'));
   rows.push({name,version:info.version,license:pkg.license??info.license??'UNKNOWN',path:destination});
 }
 rows.sort((a,b)=>a.name.localeCompare(b.name));
