@@ -1,7 +1,7 @@
 {
   "name": "vcamp-extension",
   "private": true,
-  "version": "0.1.82",
+  "version": "1.0.0-rc.1",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
@@ -10,20 +10,20 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "build:capture-test": "vite build --mode capture-test",
-    "test:e2e": "node scripts/test-e2e.mjs"
+    "test:e2e": "node scripts/test-e2e.mjs",
+    "test:package": "playwright test --config=playwright.release.config.ts",
+    "licenses": "node scripts/license-inventory.mjs",
+    "package": "node scripts/release.mjs"
   },
   "dependencies": {
-    "@remotion/paths": "4.0.534",
-    "@remotion/player": "4.0.534",
     "fflate": "0.8.3",
-    "lucide-react": "^1.59.0",
+    "lucide-react": "1.59.0",
     "pinyin-match": "1.2.10",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-markdown": "10.1.0",
     "remark-gfm": "4.0.1",
-    "remotion": "4.0.534",
-    "zod": "4.1.12"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@playwright/test": "1.61.1",
@@ -36,5 +36,10 @@
     "typescript": "5.9.3",
     "vite": "6.4.5",
     "vitest": "4.1.12"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=24.16.0 <25",
+    "npm": ">=11 <12"
   }
 }

@@ -52,7 +52,7 @@ test('T11: installed bilingual timeline, font, event follow, manual pause, prese
     await panel.getByLabel('主字幕', { exact: true }).selectOption('zh-CN');
     await panel.getByLabel('辅助语言').selectOption('ja'); await expect(panel.getByRole('alert')).toContainText('此轨道被字幕服务拒绝');
     await panel.getByLabel('辅助语言').selectOption('en');
-    await panel.getByLabel('字幕字号').fill('20');
+    await panel.getByLabel('主字幕字号',{exact:true}).fill('20');
     const timeline = panel.getByLabel('字幕时间轴'); await expect(timeline).toHaveCSS('font-size', '20px');
     const listBox = await timeline.boundingBox();
     await panel.getByRole('button',{name:'字幕设置',exact:true}).click();
@@ -69,10 +69,8 @@ test('T11: installed bilingual timeline, font, event follow, manual pause, prese
     await setTime(6, true); await expect(panel.locator('.subtitle-position')).toContainText('00:06');
     expect(await timeline.evaluate(el => el.scrollTop)).toBe(manualTop);
     const refreshAndFollow = async () => {
-      await panel.getByRole('button',{name:'字幕设置',exact:true}).click();
-      await panel.getByRole('button',{name:'刷新并跟随',exact:true}).click();
-      await expect(panel.getByRole('button',{name:'刷新并跟随',exact:true})).toBeEnabled();
-      await panel.keyboard.press('Escape');
+      await panel.locator('.titlebar').getByRole('button',{name:'刷新',exact:true}).click();
+      await expect(panel.locator('.titlebar').getByRole('button',{name:'刷新',exact:true})).toBeEnabled();
     };
     await refreshAndFollow(); await expect(panel.locator('.subtitle-position')).not.toContainText('已暂停跟随'); expect(await currentVisible()).toBe(true);
     await panel.getByRole('button',{name:'字幕设置',exact:true}).click();

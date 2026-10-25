@@ -1,6 +1,13 @@
 import {useId} from 'react';
-import {interpolatePath} from '@remotion/paths';
 import {PALETTE, PLAY_UP_PATH, V_PATH} from './brand';
+
+// These two authored silhouettes have identical M/C/Z topology. Interpolate
+// their coordinates directly; a general path/video library is unnecessary.
+const targetCoordinates=PLAY_UP_PATH.match(/-?\d+(?:\.\d+)?/g)!.map(Number);
+function markPath(progress:number){
+  let index=0;const amount=Math.max(0,Math.min(1,progress));
+  return V_PATH.replace(/-?\d+(?:\.\d+)?/g,value=>String(Number(value)+(targetCoordinates[index++]-Number(value))*amount));
+}
 
 export function BrandMark({morph=0, rotation=0, size=144, tile=false}: {morph?:number;rotation?:number;size?:number;tile?:boolean}) {
   const id = useId().replace(/:/g, '');
@@ -14,7 +21,7 @@ export function BrandMark({morph=0, rotation=0, size=144, tile=false}: {morph?:n
     </defs>
     {tile && <rect x="2" y="2" width="252" height="252" rx="60" fill={`url(#${id}-tile)`} stroke="#fce3ec"/>}
     <g transform={`rotate(${rotation} 128 128)`} data-rotation={rotation} data-morph={morph}>
-      <path d={interpolatePath(morph, V_PATH, PLAY_UP_PATH)} fill={`url(#${id}-pink)`}/>
+      <path d={markPath(morph)} fill={`url(#${id}-pink)`}/>
       <path d="M55 46 C43 46 37 58 43 70 L94 182 C100 196 112 204 128 204 C144 204 156 196 162 182 C147 190 140 177 134 163 L94 60 C90 51 84 46 75 46 Z" fill={`url(#${id}-fold)`} opacity={Math.max(0, 1-morph*2)}/>
     </g>
   </svg>;

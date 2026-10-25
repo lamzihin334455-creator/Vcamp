@@ -32,6 +32,7 @@ test('production official DeepSeek HTML repairs existing time syntax at read tim
     await command({type:'provider.import-models',modelIds:['deepseek-flash'],expectedRevision:provider.revision});
     await page.reload();await expect(page.getByTestId('startup')).toHaveCount(0);
     await page.getByRole('button',{name:'切换当前内容',exact:true}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
+    await expect(page.locator('.context-module')).toHaveText('对话 02');
     await page.getByLabel('输入草稿',{exact:true}).fill('@交互学习页');await page.locator('#mention-menu').getByRole('button',{name:'交互学习页',exact:true}).click();
     await page.getByLabel('输入草稿',{exact:true}).fill('按原片的不同说法做交互时间线');await site.bringToFront();
     const space=(await command({type:'workspace.query'})).view,target={kind:'chat',workspaceId:space.workspaceId,chatId:space.chatId};

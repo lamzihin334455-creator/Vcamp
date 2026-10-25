@@ -1,7 +1,7 @@
 import {mediaDisplay} from '../shared/media-labels';
 import {databaseTransaction} from './database';
 import {ApplicationError,type VideoKey} from '../contracts/application';
-import {documentSelectionSchema,formatsFor,type DocumentExport,type DocumentSelection} from '../contracts/documents';
+import {documentLimits,documentSelectionSchema,formatsFor,type DocumentExport,type DocumentSelection} from '../contracts/documents';
 import type {StoredWorkspace} from './indexed-store';
 import type {SubtitleVersion} from '../contracts/subtitles';
 import type {Cue,NativeTrack} from '../contracts/video';
@@ -21,13 +21,18 @@ export class IndexedDocumentStore {
   // All selected saved revisions are fixed by one readonly transaction. Native
   // cues, if supplied, must already have a source binding validated by the host.
   async export(selection:DocumentSelection[],native?:NativeExport):Promise<DocumentExport>{
-    const parsed=selection.map(v=>documentSelectionSchema.parse(v));
-    const scribbleCounts=new Map<string,number>();
+    if(!selection.length||selection.length>100)throw new ApplicationError('resource-limit');
+    const parsed=selection.map(v=>documentSelectionSchema.parse(v)).filter((pick,index,all)=>all.findIndex(other=>JSON.stringify(other)===JSON.stringify(pick))===index);
+    const scribbleIds=new Map<string,Set<string>>();
     for(const pick of parsed)if(pick.target.entityType==='scribble'){
-      const key=JSON.stringify([pick.target.workspaceId,pick.format]);scribbleCounts.set(key,(scribbleCounts.get(key)??0)+1);
+      const key=JSON.stringify([pick.target.workspaceId,pick.format]),ids=scribbleIds.get(key)??new Set<string>();ids.add(pick.target.id);scribbleIds.set(key,ids);
     }
-    const picks=parsed.map(pick=>pick.target.entityType==='scribble'&&(scribbleCounts.get(JSON.stringify([pick.target.workspaceId,pick.format]))??0)>1?{...pick,target:{...pick.target,id:'*'}}:pick)
-      .filter((pick,index,all)=>all.findIndex(other=>JSON.stringify(other)===JSON.stringify(pick))===index);
+    const groups=new Set<string>();
+    const picks=parsed.filter(pick=>{
+      if(pick.target.entityType!=='scribble')return true;
+      const key=JSON.stringify([pick.target.workspaceId,pick.format]);
+      if(groups.has(key))return false;groups.add(key);return true;
+    });
     if(!picks.length||picks.length>100)throw new ApplicationError('resource-limit');
     const rows=await databaseTransaction<Record<string,any[]>>(this.name,tables,'readonly',(tx,done)=>{
       const result:Record<string,any[]>={};let left=tables.length;
@@ -35,8 +40,8 @@ export class IndexedDocumentStore {
     });
     const out:DocumentExport={files:[],errors:[]},names=new Set<string>(),seen=new Set<string>();let total=0;
     const add=(name:string,content:string,type:'text'|'html'|'binary'='text',source?:VideoKey)=>{
-      if(content.length>2000000)throw new Error('此文件内容超限，请缩小资料范围');
-      if(total+content.length>12*1024*1024||out.files.length>=200)throw new Error('本批内容超限，请缩小选区');
+      if(content.length>(type==='binary'?documentLimits.binaryChars:documentLimits.fileChars))throw new Error('此文件内容超限，请缩小资料范围');
+      if(total+content.length>documentLimits.batchChars||out.files.length>=200)throw new Error('本批内容超限，请缩小选区');
       const clean=safeFilename(name),dot=clean.lastIndexOf('.'),stem=dot>0?clean.slice(0,dot):clean,ext=dot>0?clean.slice(dot):'';
       let unique=clean,n=2;while(names.has(unique.toLocaleLowerCase()))unique=`${stem}_${n++}${ext}`;names.add(unique.toLocaleLowerCase());
       total+=content.length;out.files.push({name:unique,content,type,...(source?{source:{videoId:source.videoId,...(source.pageNumber?{pageNumber:source.pageNumber}:{})}}:{})});return unique;
@@ -78,9 +83,10 @@ export class IndexedDocumentStore {
           add(`${prefix}_${a.title}.${format}`,a.type==='html-page'?revision.content:header+`保存版本：${a.revision}\n\n`+revision.content+(attachments?'\n\n来源截图：\n'+attachments:''),a.type==='html-page'?'html':'text',a.type==='html-page'?source:undefined);continue;
         }
         if(target.entityType==='scribble'){
-          const items=rows.scribbles.filter(v=>v.workspaceId===space.id&&!v.deleted&&(target.id==='*'||v.id===target.id)).sort((a,b)=>(a.time??Infinity)-(b.time??Infinity)||(a.creationOrder??0)-(b.creationOrder??0));
+          const ids=scribbleIds.get(JSON.stringify([space.id,format]))!;
+          const items=rows.scribbles.filter(v=>v.workspaceId===space.id&&!v.deleted&&(ids.has('*')||ids.has(v.id))).sort((a,b)=>(a.time??Infinity)-(b.time??Infinity)||(a.creationOrder??0)-(b.creationOrder??0));
           if(!items.length)throw new Error('没有所选随笔');
-          add(`${prefix}_${target.id==='*'?'随笔汇总':items[0].text.slice(0,30)}.${format}`,header+'\n'+items.map(v=>`${v.time===null?'无时间点':format==='md'?`[${formatTime(v.time)}](vcamp-time:${v.time})`:formatTime(v.time)}\n${v.text}`).join('\n\n'));continue;
+          add(`${prefix}_${ids.has('*')||ids.size>1?'随笔汇总':items[0].text.slice(0,30)}.${format}`,header+'\n'+items.map(v=>`${v.time===null?'无时间点':format==='md'?`[${formatTime(v.time)}](vcamp-time:${v.time})`:formatTime(v.time)}\n${v.text}`).join('\n\n'));continue;
         }
         const versions=rows.subtitleVersions.filter(v=>v.workspaceId===space.id) as SubtitleVersion[];
         const isNative=isNativeTrackId(target.id);

@@ -19,7 +19,7 @@ test('a normal request cannot make the planner start video-frame capture',async(
     const command=(operation:any)=>page.evaluate(operation=>chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation}),operation);
     expect((await command({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'SYNTHETIC_LOCAL_ONLY'})).ok).toBe(true);
     const fetched=await command({type:'provider.fetch',expectedRevision:1});
-    expect((await command({type:'provider.default',expectedRevision:fetched.view.provider.revision,modelId:'local-vision'})).ok).toBe(true);
+    expect((await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['local-vision']})).ok).toBe(true);
     await page.reload();await site.bringToFront();
     await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
     {const current=(await command({type:'workspace.query'})).view;fixture.workspaceId=current.workspaceId;fixture.chatId=current.chatId;}
@@ -61,7 +61,7 @@ test('builtin knowledge note carries its task into autonomous vision and stores 
     const command=(operation:any)=>page.evaluate(operation=>chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation}),operation);
     expect((await command({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'SYNTHETIC_LOCAL_ONLY'})).ok).toBe(true);
     const fetched=await command({type:'provider.fetch',expectedRevision:1});
-    expect((await command({type:'provider.default',expectedRevision:fetched.view.provider.revision,modelId:'local-vision'})).ok).toBe(true);
+    expect((await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['local-vision']})).ok).toBe(true);
     await page.reload();await site.bringToFront();
     await page.getByRole('button',{name:'切换当前内容'}).click();
     await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
@@ -125,7 +125,7 @@ test('enabled autonomous vision does not force a frame when planning returns no 
     const command=(operation:any)=>page.evaluate(operation=>chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation}),operation);
     expect((await command({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'SYNTHETIC_LOCAL_ONLY'})).ok).toBe(true);
     const fetched=await command({type:'provider.fetch',expectedRevision:1});
-    expect((await command({type:'provider.default',expectedRevision:fetched.view.provider.revision,modelId:'local-vision'})).ok).toBe(true);
+    expect((await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['local-vision']})).ok).toBe(true);
     await page.reload();await site.bringToFront();
     await page.getByRole('button',{name:'切换当前内容'}).click();
     await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
@@ -165,7 +165,7 @@ test('an explicitly authorized no-subtitle video is answered from representative
     const command=(operation:any)=>page.evaluate(operation=>chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation}),operation);
     expect((await command({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'SYNTHETIC_LOCAL_ONLY'})).ok).toBe(true);
     const fetched=await command({type:'provider.fetch',expectedRevision:1});
-    expect((await command({type:'provider.default',expectedRevision:fetched.view.provider.revision,modelId:'local-vision'})).ok).toBe(true);
+    expect((await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['local-vision']})).ok).toBe(true);
     await site.goto('https://www.bilibili.com/video/BVnosub/?p=1');await site.bringToFront();
     await expect.poll(async()=>{const view=(await command({type:'workspace.query'})).view;return {title:view.title,status:view.video?.status};},{timeout:10_000}).toEqual({title:'无字幕视觉样本',status:'no-subtitles'});
     const current=(await command({type:'workspace.query'})).view,target={workspaceId:current.workspaceId,chatId:current.chatId};

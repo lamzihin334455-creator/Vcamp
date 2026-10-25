@@ -25,7 +25,7 @@ for(const output of ['markdown','html'] as const)test(`autonomous ${output} pres
   const command=(operation:any)=>page.evaluate(operation=>chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation}),operation);
   expect((await command({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'SYNTHETIC_AUTOVISION_BUDGET'})).ok).toBe(true);
   let fetched=await command({type:'provider.fetch',expectedRevision:1});fetched=await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:fetched.view.provider.catalog.map((model:any)=>model.id)});
-  await command({type:'provider.default',expectedRevision:fetched.view.provider.revision,modelId:'local-vision'});
+  await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['local-vision']});
   await page.reload();await site.bringToFront();
   await expect(page.locator('.context-current-button .sr-only')).toHaveText('完整字幕已就绪');
   await expect(page.getByTestId('startup')).toHaveCount(0);

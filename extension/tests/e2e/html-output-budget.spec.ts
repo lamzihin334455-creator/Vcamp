@@ -70,7 +70,7 @@ for (const withTemplate of [false, true]) test(`actual send action template=${wi
     expect((await command({type: 'provider.save-key', providerId: 'deepseek', expectedRevision: 0, key: 'SYNTHETIC_LOCAL_ONLY'})).ok).toBe(true);
     let fetched = await command({type: 'provider.fetch', expectedRevision: 1});
     fetched = await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['local-fixture']});
-    expect((await command({type: 'provider.default', expectedRevision: fetched.view.provider.revision, modelId: 'local-fixture'})).ok).toBe(true);
+    expect((await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['local-fixture']})).ok).toBe(true);
     const initial = (await command({type: 'workspace.query'})).view;
     const subtitles = (await command({type: 'subtitles.query', workspaceId: initial.workspaceId})).view.subtitles;
     expect((await command({type: 'subtitles.source.select', workspaceId: initial.workspaceId,

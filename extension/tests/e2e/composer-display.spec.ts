@@ -34,14 +34,14 @@ test('scribbles use the same composer with separately removable mode and time ta
   const original=await input.evaluate(el=>({radius:getComputedStyle(el.parentElement!).borderRadius,font:getComputedStyle(el).fontSize,height:el.getBoundingClientRect().height}));
   await input.fill('!');await page.locator('#mention-menu').getByRole('button',{name:/^写随笔/}).click();
   await expect(page.getByRole('button',{name:'取消随笔',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'移除随笔时间点',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'发送',exact:true})).toBeVisible();
-  await expect(composer).not.toContainText('当前模型视觉能力');
+  await expect(composer.getByRole('alert')).toHaveCount(0);
   expect(await input.evaluate(el=>({radius:getComputedStyle(el.parentElement!).borderRadius,font:getComputedStyle(el).fontSize,height:el.getBoundingClientRect().height}))).toEqual(original);
   await expect(composer).not.toContainText('Enter 保存');await expect(composer.getByRole('button',{name:'保存随笔',exact:true})).toHaveCount(0);
   await page.getByRole('button',{name:'移除随笔时间点',exact:true}).click();await expect(page.getByRole('button',{name:'取消随笔',exact:true})).toBeVisible();await input.fill('没有时间的独立随笔');await input.press('Enter');
   await expect(page.getByRole('button',{name:'取消随笔',exact:true})).toHaveCount(0);
   const stored=()=>page.evaluate(workspaceId=>chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation:{type:'scribble.query',workspaceId}}),fixture.workspaceId);
   await expect.poll(async()=>((await stored()).view.scribbles.scribbles as any[]).some(item=>item.text==='没有时间的独立随笔'&&item.time===null)).toBe(true);
-  await input.fill('!');await page.locator('#mention-menu').getByRole('button',{name:/^写随笔/}).click();await input.fill('保留输入内容');await page.screenshot({path:test.info().outputPath('scribble-tags.png'),animations:'disabled'});await page.getByRole('button',{name:'取消随笔',exact:true}).click();await expect(input).toHaveValue('保留输入内容');await expect(composer).toContainText('当前模型视觉能力');
+  await input.fill('!');await page.locator('#mention-menu').getByRole('button',{name:/^写随笔/}).click();await input.fill('保留输入内容');await page.screenshot({path:test.info().outputPath('scribble-tags.png'),animations:'disabled'});await page.getByRole('button',{name:'取消随笔',exact:true}).click();await expect(input).toHaveValue('保留输入内容');await expect(composer.getByRole('alert')).toContainText('请选择 DeepSeek 已声明支持视觉的模型');await expect(composer.getByRole('button',{name:'发送',exact:true})).toBeDisabled();
   expect(forbidden).toEqual([]);
  }finally{await context.close();}
 });

@@ -92,7 +92,8 @@ test('production reduced motion, narrow viewport, reader exclusion and icon meta
     await expect(page.getByTestId('startup')).toHaveCount(0);
     const bundle=resolve(process.env.EXPERIENCE_BUNDLE??'dist');
     const manifest=JSON.parse(await readFile(resolve(bundle,'manifest.json'),'utf8'));
-    expect(manifest.version).toBe(JSON.parse(await readFile('package.json','utf8')).version);
+    expect(manifest.version).toBe(JSON.parse(await readFile('package.json','utf8')).version.split('-')[0]);
+    expect(manifest.version_name).toBe(JSON.parse(await readFile('package.json','utf8')).version);
     expect(manifest.icons['128']).toBe('icons/icon-128.png');
     expect(manifest.action.default_icon['16']).toBe('icons/icon-16.png');
     for(const size of [16,32,48,128,256]){

@@ -18,7 +18,7 @@ async function attach(client:CDPSession,targetId:string){
 
 test('native side panel displays startup on first open and close/reopen',async()=>{
   await mkdir('.profiles',{recursive:true});
-  const extension=resolve(process.env.BRAND_EXTENSION??'dist');
+  const extension=resolve(process.env.BRAND_EXTENSION??process.env.EXPERIENCE_BUNDLE??'dist');
   const context=await chromium.launchPersistentContext(await mkdtemp(resolve('.profiles/NativeBrand-')),{channel:'chromium',headless:true,args:[`--disable-extensions-except=${extension}`,`--load-extension=${extension}`]});
   try{
     const worker=context.serviceWorkers()[0]??await context.waitForEvent('serviceworker');

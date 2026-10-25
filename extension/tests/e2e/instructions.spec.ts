@@ -19,7 +19,9 @@ test('subtitle correction and translation expose their actual protocols and pres
     });
     const command = (operation: any) => page.evaluate(operation => chrome.runtime.sendMessage({ version: 1, requestId: crypto.randomUUID(), operation }), operation);
     expect((await command({ type: 'provider.save-key', providerId: 'deepseek', expectedRevision: 0, key: 'SYNTHETIC_LOCAL_ONLY' })).ok).toBe(true);
-    expect((await command({ type: 'provider.fetch', expectedRevision: 1 })).ok).toBe(true);
+    const fetched=await command({ type: 'provider.fetch', expectedRevision: 1 });
+    expect(fetched.ok).toBe(true);
+    expect((await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['local-text']})).ok).toBe(true);
     const binding = (await command({ type: 'workspace.query' })).view.video.binding;
     let latestJobId = '';
     for (const operation of ['enhance', 'translate']) {

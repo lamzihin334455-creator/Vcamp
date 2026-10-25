@@ -31,7 +31,7 @@ for(const variant of ['cue','schema','json','cache','stop'] as const)test(`a com
     const command=(operation:any)=>page.evaluate(operation=>chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation}),operation);
     await command({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'SYNTHETIC_RECOVERY_KEY'});
     const provider=await command({type:'provider.fetch',expectedRevision:1});
-    await command({type:'provider.default',expectedRevision:provider.view.provider.revision,modelId:'deepseek-flash'});
+    await command({type:'provider.import-models',expectedRevision:provider.view.provider.revision,modelIds:['deepseek-flash']});
     await page.reload();await site.bringToFront();
     await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
     await page.getByRole('button',{name:'联网',exact:true}).click();

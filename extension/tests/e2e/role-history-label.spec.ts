@@ -22,7 +22,7 @@ test('saved role preferences display their frozen name after preset upgrade, edi
     expect(presets.ok).toBe(true);
     expect(presets.view.roles.roles.find((role: any) => role.id === oldPreset.roleId).revisionId).toBe('role-professor:v2');
     await chooseSavedPreference(oldPreset);
-    await expect(page.locator('.quick-role-trigger small')).toHaveText('老教授（历史版本）');
+    await expect(page.getByRole('button',{name:'当前角色',exact:true})).toHaveText('老教授（历史版本）');
     await expectFrozenPreference(oldPreset);
 
     const created = await command({ type: 'role.create', fields: { name: '原先的角色名', description: '', instructions: '保持已保存的旧表达指令' } });
@@ -30,10 +30,10 @@ test('saved role preferences display their frozen name after preset upgrade, edi
     const role = created.view.roles.roles.find((role: any) => role.name === '原先的角色名');
     const original = { roleId: role.id, revisionId: role.revisionId };
     await chooseSavedPreference(original);
-    await expect(page.locator('.quick-role-trigger small')).toHaveText('原先的角色名');
+    await expect(page.getByRole('button',{name:'当前角色',exact:true})).toHaveText('原先的角色名');
     const edited = await command({ type: 'role.save', roleId: role.id, expectedRevision: role.revision, fields: { name: '后来修改的角色名', description: '', instructions: '这是新版本，不得代替已选版本' } });
     expect(edited.ok).toBe(true);
-    await expect(page.locator('.quick-role-trigger small')).toHaveText('原先的角色名（历史版本）');
+    await expect(page.getByRole('button',{name:'当前角色',exact:true})).toHaveText('原先的角色名（历史版本）');
     await expectFrozenPreference(original);
 
     const latest = edited.view.roles.roles.find((candidate: any) => candidate.id === role.id);
@@ -43,7 +43,7 @@ test('saved role preferences display their frozen name after preset upgrade, edi
     await page.reload(); await site.bringToFront();
     await expect(page.getByLabel('输入草稿')).toBeEnabled();
     await page.getByRole('button', { name: '设置', exact: true }).click();
-    await expect(page.locator('.quick-role-trigger small')).toHaveText('原先的角色名（历史版本）');
+    await expect(page.getByRole('button',{name:'当前角色',exact:true})).toHaveText('原先的角色名（历史版本）');
     await expectFrozenPreference(original);
     const historical = await command({ type: 'role.query', selected: original });
     expect(historical.view.roles.revisions[0]).toMatchObject({ ...original, name: '原先的角色名', instructions: '保持已保存的旧表达指令' });

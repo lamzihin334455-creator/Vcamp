@@ -58,7 +58,9 @@ export class IndexedBackupStore {
     try {
       const preferences = await this.preferences?.read();
       const raw = await databaseTransaction<Raw>(this.name, backupTables, 'readonly', (tx, done) => read(tx, done));
-      const packet = await encodeStream(project(raw, preferences), preferences);
+      const payload=project(raw,preferences);
+      validateBackup(payload);
+      const packet = await encodeStream(payload, preferences);
       if (!this.transfers.has(id)) throw new ApplicationError('plan-expired');
       this.transfers.set(id, { kind: 'export', ...packet, expiresAt: Date.now() + transferLifetime });
       return { id, manifest: packet.manifest };
@@ -91,7 +93,9 @@ export class IndexedBackupStore {
   async export(): Promise<string> {
     const preferences=await this.preferences?.read();
     const raw=await databaseTransaction<Raw>(this.name, backupTables, 'readonly', (tx, done) => read(tx, done));
-    return encode(project(raw,preferences),preferences);
+    const payload=project(raw,preferences);
+    validateBackup(payload);
+    return encode(payload,preferences);
   }
   async preview(file: string): Promise<BackupPlan> {
     const { payload, checksum, preferences } = await decode(file);

@@ -156,6 +156,7 @@ export class IndexedGenerationStore {
       // Freeze a bounded candidate pool. The evidence planner selects actual
       // historical images later; do not reserve three worst-case new images or
       // drop a whole textual turn merely because its image is not replayed.
+      if(!visionDeclared&&availableHistory.some(entry=>entry.attachmentIds.length))throw new ApplicationError('unsupported-capability');
       let remainingImages=visionDeclared?imageLimits.count-currentImages.length:0;
       let remainingBytes=imageLimits.totalBytes-currentImages.reduce((n,image)=>n+image.bytes,0);
       const frozenImageIds=new Set(draft.attachmentIds);

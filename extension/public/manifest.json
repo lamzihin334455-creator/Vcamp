@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Vcamp",
-  "version": "0.1.82",
-  "minimum_chrome_version": "116",
+  "version": "1.0.0",
+  "minimum_chrome_version": "149",
   "description": "围绕视频学习的本地工作台",
   "permissions": [
     "sidePanel",
@@ -55,5 +55,6 @@
   },
   "optional_host_permissions": [
     "https://*/*"
-  ]
+  ],
+  "version_name": "1.0.0-rc.1"
 }

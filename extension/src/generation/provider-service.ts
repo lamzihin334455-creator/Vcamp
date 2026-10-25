@@ -72,7 +72,7 @@ export function createProviderService(storage: CredentialStore, transport: typeo
       if (op.type === 'provider.save-key' && op.providerId !== state.providerId) throw new ApplicationError('revision-conflict');
       if (op.type === 'provider.configure' && !await authorize(op.baseUrl)) throw new ApplicationError('permission-denied');
       if (op.type === 'provider.add-model' && (!state.key || nativeDeepSeek(state) || state.models.length >= 1000)) throw new ApplicationError('unsupported-capability');
-      if (op.type === 'provider.default' && !state.models.some(model => model.id === op.modelId)) throw new ApplicationError('model-unavailable');
+      if (op.type === 'provider.default' && !state.models.some(model => model.id === op.modelId && model.text !== 'unsupported')) throw new ApplicationError('model-unavailable');
       let next = { ...state, revision: state.revision + 1 };
       if (op.type === 'provider.configure') {
         next.providerId = op.providerId; next.baseUrl = op.baseUrl;
@@ -124,7 +124,7 @@ export function createProviderService(storage: CredentialStore, transport: typeo
       if (op.type === 'provider.import-models') {
         if (!state.key) throw new ApplicationError('model-unavailable');
         const available = new Map([...(state.catalog ?? []), ...state.models].map(model => [model.id, model]));
-        if (op.modelIds.some(id => !available.has(id))) throw new ApplicationError('model-unavailable');
+        if (op.modelIds.some(id => !available.has(id)||available.get(id)!.text==='unsupported')) throw new ApplicationError('model-unavailable');
         next.models = op.modelIds.map(id => available.get(id)!);
         if (!next.models.some(model => model.id === next.defaultModelId)) next.defaultModelId = next.models[0]?.id ?? null;
       }

@@ -62,7 +62,7 @@ test('autonomous required frames stay on source page, reach image input, and res
     const op=async(operation:any)=>panel.evaluate(async operation=>{const reply=await chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),windowId:(await chrome.windows.getCurrent()).id,operation});if(!reply.ok)throw new Error(reply.code);return reply.view;},operation);
     const view=await op({type:'workspace.query'});const target={kind:'chat',workspaceId:view.workspaceId,chatId:view.chatId};
     await context.route('https://api.deepseek.com/models',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({object:'list',data:[{id:'local-vision',name:'Local vision',input_modalities:['text','image']}]})}));
-    const pv=(await op({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'LOCAL_FIXTURE_TOKEN'})).provider;await op({type:'provider.fetch',expectedRevision:pv.revision});await panel.reload();await panel.getByRole('button',{name:/^当前模型：/}).click();await panel.getByRole('menuitemradio',{name:/Local vision/}).click();
+    const pv=(await op({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'LOCAL_FIXTURE_TOKEN'})).provider;const fetched=(await op({type:'provider.fetch',expectedRevision:pv.revision})).provider;await op({type:'provider.import-models',modelIds:['local-vision'],expectedRevision:fetched.revision});await panel.reload();
     // One manual screenshot regression: actual saved draft attachment only.
     await panel.getByRole('button',{name:'更多输入操作',exact:true}).click();await panel.getByRole('button',{name:'截取当前画面',exact:true}).click();await expect(panel.getByLabel('草稿图片').locator('img')).toHaveCount(1);
     await panel.getByLabel('草稿图片').getByRole('button',{name:/移除图片/}).click();

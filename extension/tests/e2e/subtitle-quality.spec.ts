@@ -22,7 +22,7 @@ test('correction searches names, shares translation feedback, and changes the ma
    }) as typeof fetch;
   });
   const command=(operation:any)=>page.evaluate(operation=>chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation}),operation);
-  await command({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'SYNTHETIC_QUALITY_KEY'});const provider=await command({type:'provider.fetch',expectedRevision:1});await command({type:'provider.default',expectedRevision:provider.view.provider.revision,modelId:'deepseek-flash'});
+  await command({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'SYNTHETIC_QUALITY_KEY'});const provider=await command({type:'provider.fetch',expectedRevision:1});await command({type:'provider.import-models',expectedRevision:provider.view.provider.revision,modelIds:['deepseek-flash']});
   const source=(await command({type:'subtitles.query',workspaceId:fixture.workspaceId})).view.subtitles;
   await command({type:'subtitles.source.select',workspaceId:fixture.workspaceId,expectedRevision:source.sourceRevision,source:{kind:'native',language:'zh-CN'}});
   const original=(await command({type:'subtitles.query',workspaceId:fixture.workspaceId})).view.subtitles.analysisSource;

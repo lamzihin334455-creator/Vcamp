@@ -27,7 +27,7 @@ for(const autonomous of [false,true])test(`long native subtitles answer in full 
   });
   const command=(operation:any)=>page.evaluate(operation=>chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation}),operation);
   expect((await command({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'SYNTHETIC_LONG_CONTEXT_KEY'})).ok).toBe(true);
-  const fetched=await command({type:'provider.fetch',expectedRevision:1});await command({type:'provider.default',expectedRevision:fetched.view.provider.revision,modelId:'local-vision'});
+  const fetched=await command({type:'provider.fetch',expectedRevision:1});await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['local-vision']});
   await site.goto('https://www.bilibili.com/video/BVlongcontext/?p=1');await site.bringToFront();
   await expect.poll(async()=>(await command({type:'workspace.query'})).view.video?.cues.length,{timeout:15_000}).toBe(21001);
   await page.reload();await expect(page.getByLabel('输入草稿')).toBeEditable();

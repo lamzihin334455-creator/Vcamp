@@ -1,0 +1,13 @@
+name: Feature request
+description: Describe a user problem and desired outcome.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem should Vcamp solve?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome and alternatives

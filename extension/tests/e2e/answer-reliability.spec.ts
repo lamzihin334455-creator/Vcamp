@@ -25,7 +25,7 @@ for(const captionless of [false,true])test(`installed production pipeline comple
     const command=(operation:any)=>page.evaluate(operation=>chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation}),operation);
     expect((await command({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'SYNTHETIC_RELIABILITY_KEY'})).ok).toBe(true);
     const fetched=await command({type:'provider.fetch',expectedRevision:1});
-    expect((await command({type:'provider.default',expectedRevision:fetched.view.provider.revision,modelId:'deepseek-flash'})).ok).toBe(true);
+    expect((await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['deepseek-flash']})).ok).toBe(true);
     await page.reload();await site.bringToFront();
     if(captionless){await site.goto('https://www.bilibili.com/video/BVnosub/');await site.bringToFront();await expect(page.locator('.context-current-button')).toContainText('无字幕视觉样本');}
     await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();

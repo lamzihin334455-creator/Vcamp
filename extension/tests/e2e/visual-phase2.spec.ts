@@ -41,7 +41,7 @@ for(const mode of ['sufficient','partial-checks','limited-checks','interval','mi
     },mode);
     const command=(operation:any)=>page.evaluate(operation=>chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation}),operation);
     expect((await command({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'SYNTHETIC_LOCAL_ONLY'})).ok).toBe(true);
-    const fetched=await command({type:'provider.fetch',expectedRevision:1});expect((await command({type:'provider.default',expectedRevision:fetched.view.provider.revision,modelId:'local-vision'})).ok).toBe(true);
+    const fetched=await command({type:'provider.fetch',expectedRevision:1});expect((await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['local-vision']})).ok).toBe(true);
     await page.reload();await site.bringToFront();
     // Reload first renders an unbound composer; its context menu has no new-chat action.
     await expect(page.getByLabel('输入草稿')).toBeEnabled();
@@ -71,7 +71,7 @@ for(const mode of ['sufficient','partial-checks','limited-checks','interval','mi
       expect(before.visual.audit.frames[0].time).toBeLessThan(before.visual.audit.frames[1].time);
     }
     const reviewCall=await worker.evaluate(()=>(globalThis as any).phase2Requests.find((r:any)=>r.kind==='review'));
-    expect(reviewCall.leaseKeys).toEqual([]);expect(reviewCall.body.max_tokens).toBe(4096);
+    expect(reviewCall.leaseKeys).toEqual([]);expect(reviewCall.body.max_tokens).toBe(16384);
     const reviewImages=reviewCall.body.messages[1].content.filter((p:any)=>p.type==='image_url');expect(reviewImages).toHaveLength(expectedImages);expect(reviewImages[0].image_url.detail).toBe('original');
     expect(await site.locator('video').evaluate((v:HTMLVideoElement)=>v.currentTime)).toBeCloseTo(.5,1);
     if(mode!=='repair'&&mode!=='takeover'&&mode!=='source-change')await site.locator('video').evaluate(async(v:HTMLVideoElement)=>{v.currentTime=.9;await new Promise(r=>v.addEventListener('seeked',r,{once:true}));});
@@ -154,7 +154,7 @@ for(const mode of ['sufficient','partial-checks','limited-checks','interval','mi
       expect((await query()).visual.review.results[0].checks).toEqual(v.review.results[0].checks);
       await page.locator('.visual-evidence > summary').click();
     }
-    if(mode==='interval')await expect(page.locator('.visual-evidence')).toContainText('连续区间取样安排');
+    if(mode==='interval')await expect(page.locator('.visual-evidence')).toContainText('画面取样说明');
     if(mode==='missing-unresolved')await expect(page.locator('.visual-evidence')).toContainText('未提供未解决项清单');
     if(['cue-plan','correct-plan'].includes(mode))await expect(page.locator('.visual-evidence')).toContainText('本地按原字幕精确时间计算');
     if(mode==='correct-plan')await expect(page.locator('.visual-evidence')).toContainText('一次');

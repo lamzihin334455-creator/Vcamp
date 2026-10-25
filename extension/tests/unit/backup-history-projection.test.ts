@@ -7,6 +7,7 @@ import { IndexedRoleStore } from '../../src/data/role-store';
 import { IndexedBackupStore } from '../../src/data/backup-store';
 import { IndexedLibraryStore } from '../../src/data/library-store';
 import { encodeStream } from '../../src/data/backup-stream';
+import { encode } from '../../src/data/backup-format';
 import { previewBackupFile } from '../../src/library/backup-file';
 import { createLibraryService } from '../../src/library/service';
 import { png } from '../fixtures/png';
@@ -25,7 +26,7 @@ async function sample(withImages = false, nextType: 'markdown' | 'html' | 'chat'
   await jobs.finish(first.jobId, first.attempts[0].attemptId, 'failed', 'network');
   const next = (await spaces.read(space.id, space.chatId))!.draft;
   await spaces.save(space.id, next.revision, { ...next, text: '第二轮生成资料', outputType: nextType }, space.chatId);
-  const second = await jobs.freezeChat(target, next.revision + 1, basis);
+  const second = await jobs.freezeChat(target, next.revision + 1, basis, withImages);
   await jobs.finish(second.jobId, second.attempts[0].attemptId, 'failed', 'network');
   const backup = new IndexedBackupStore(name), packet = JSON.parse(await backup.export());
   return { name, backup, packet, secondId: second.jobId };
@@ -42,7 +43,7 @@ async function previewPacket(packet: any, name = crypto.randomUUID()) {
 test.each([{ withImages: false, nextType: 'markdown' as const }, { withImages: true, nextType: 'markdown' as const }, { withImages: false, nextType: 'html' as const }, { withImages: true, nextType: 'html' as const }])('real artifact generation restores without changing saved history ($nextType, images=$withImages)', async ({ withImages, nextType }) => {
   const { packet, secondId } = await sample(withImages, nextType);
   const history = packet.payload.jobs.find((job: any) => job.jobId === secondId).snapshot.historyProjection[0];
-  expect(history.roleSnapshot).toBeUndefined(); expect(history.attachmentIds).toEqual([]);
+  expect(history.roleSnapshot).toBeUndefined(); expect(history.attachmentIds).toHaveLength(withImages?1:0);
   const { backup, plan, name } = await previewPacket(packet);
   await backup.execute(plan.planId, plan.checksum);
   const restored = JSON.parse(await backup.export()).payload;
@@ -54,7 +55,11 @@ test.each([{ withImages: false, nextType: 'markdown' as const }, { withImages: t
 });
 
 test('filtered history remains compatible with the legacy JSON importer', async () => {
-  const { backup } = await sample(true), file = await backup.export();
+  const { packet, secondId } = await sample(true);
+  // Historical versions could omit images from the projected request without
+  // deleting the original message. The importer must still accept those files.
+  packet.payload.jobs.find((job:any)=>job.jobId===secondId).snapshot.historyProjection[0].attachmentIds=[];
+  const file=await encode(packet.payload,packet.preferences);
   await expect(new IndexedBackupStore(crypto.randomUUID()).preview(file)).resolves.toHaveProperty('planId');
 });
 

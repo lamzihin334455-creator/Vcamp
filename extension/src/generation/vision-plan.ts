@@ -110,7 +110,14 @@ export function parseEvidenceProposal(output:string,duration:number,cues:readonl
   }catch(error){
     if(error instanceof VisionPlanValidationError)return {failure:error.failure};
     if(error instanceof ZodError){
-      const fields=[...new Set(error.issues.map(issue=>issue.path.join('.')).filter(path=>visionPlanFailureSchema.shape.fields.element.safeParse(path).success))].slice(0,8);
+      // Zod's collection guard can wrap a size failure in invalid_union. Keep
+      // the precise bounded field, without recording model values/messages.
+      const paths=error.issues.flatMap(issue=>{
+        if(issue.code!=='invalid_union')return [issue.path];
+        const bounded=issue.errors.flat().filter(child=>child.code==='too_big'||child.code==='too_small');
+        return bounded.length?bounded.map(child=>[...issue.path,...child.path]):[issue.path];
+      });
+      const fields=[...new Set(paths.map(path=>path.join('.')).filter(path=>visionPlanFailureSchema.shape.fields.element.safeParse(path).success))].slice(0,8);
       return {failure:{code:'invalid-schema',fields}};
     }
     // Legacy time validation uses the older fixed error vocabulary.

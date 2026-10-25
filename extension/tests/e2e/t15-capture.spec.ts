@@ -37,8 +37,8 @@ test('T15 installed current frame -> multi-image draft -> HTTP / retry / reader 
     const other=await op(panel,{type:'chat.create',workspaceId:target.workspaceId});
     expect((await raw(panel,{type:'attachment.read',target:{workspaceId:target.workspaceId,chatId:other.chatId},ids})).code).toBe('forbidden');
     await op(panel,{type:'chat.select',...target});await panel.reload();
-    await panel.getByRole('button',{name:/^当前模型：/}).click();await panel.getByRole('menuitemradio',{name:/Text only/}).click();await panel.getByLabel('输入草稿').fill('图片请求');await expect(panel.getByRole('button',{name:'发送',exact:true})).toBeDisabled();
-    await panel.getByRole('button',{name:/^当前模型：/}).click();await panel.getByRole('menuitemradio',{name:/Synthetic vision/}).click();await expect(panel.getByRole('status')).toHaveText('草稿已保存');
+    await panel.getByRole('button',{name:'设置',exact:true}).click();await panel.getByRole('button',{name:'当前应用模型',exact:true}).click();await panel.getByRole('option',{name:/Text only/}).click();await expect(panel.getByRole('button',{name:'当前应用模型',exact:true})).toContainText('Text only');await panel.getByRole('button',{name:'设置',exact:true}).click();await expect(panel.getByLabel('工作台设置',{exact:true})).toHaveCount(0);await panel.getByLabel('输入草稿').fill('图片请求');await expect(panel.getByRole('button',{name:'发送',exact:true})).toBeDisabled();
+    await panel.getByRole('button',{name:'设置',exact:true}).click();await panel.getByRole('button',{name:'当前应用模型',exact:true}).click();await panel.getByRole('option',{name:/Synthetic vision/}).click();await expect(panel.getByRole('button',{name:'当前应用模型',exact:true})).toContainText('Synthetic vision');await panel.getByRole('button',{name:'设置',exact:true}).click();await expect(panel.getByLabel('工作台设置',{exact:true})).toHaveCount(0);await expect(panel.getByRole('status')).toHaveText('草稿已保存');
     await panel.screenshot({path:resolve(output,'draft-360.png')});
     await panel.getByRole('button',{name:'发送',exact:true}).click();
     const view=async()=>(await op(panel,{type:'generation.query',target:chatTarget})).generation;

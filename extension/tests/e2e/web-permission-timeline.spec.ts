@@ -20,7 +20,7 @@ test('system default synchronizes current chat; independent overrides control ac
     const command=(operation:any)=>page.evaluate(operation=>chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation}),operation);
     expect((await command({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'SYNTHETIC_PERMISSION_KEY'})).ok).toBe(true);
     let fetched=await command({type:'provider.fetch',expectedRevision:1});fetched=await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:fetched.view.provider.catalog.map((model:any)=>model.id)});
-    expect((await command({type:'provider.default',expectedRevision:fetched.view.provider.revision,modelId:'deepseek-flash'})).ok).toBe(true);
+    expect((await command({type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['deepseek-flash']})).ok).toBe(true);
     await page.reload();await site.bringToFront();
     const newChat=async()=>{await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();};
     const top=page.getByRole('button',{name:'联网',exact:true});

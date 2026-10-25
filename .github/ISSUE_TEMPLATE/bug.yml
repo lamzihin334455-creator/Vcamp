@@ -1,0 +1,24 @@
+name: Bug report
+description: Report a reproducible product problem without private data.
+body:
+  - type: markdown
+    attributes:
+      value: "For vulnerabilities, use the repository Security tab's private reporting channel. Never paste API keys, private backups, profiles or full transcripts."
+  - type: input
+    id: version
+    attributes:
+      label: Vcamp version and browser version
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true

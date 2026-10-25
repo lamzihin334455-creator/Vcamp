@@ -27,7 +27,7 @@ for (const mode of ['pair', 'overview', 'takeover'] as const) test(`phase one ${
     const command = (operation: any) => page.evaluate(operation => chrome.runtime.sendMessage({ version: 1, requestId: crypto.randomUUID(), operation }), operation);
     expect((await command({ type: 'provider.save-key', providerId: 'deepseek', expectedRevision: 0, key: 'SYNTHETIC_LOCAL_ONLY' })).ok).toBe(true);
     const fetched = await command({ type: 'provider.fetch', expectedRevision: 1 });
-    expect((await command({ type: 'provider.default', expectedRevision: fetched.view.provider.revision, modelId: 'local-vision' })).ok).toBe(true);
+    expect((await command({ type:'provider.import-models',expectedRevision:fetched.view.provider.revision,modelIds:['local-vision'] })).ok).toBe(true);
     await page.reload(); await site.bringToFront();
     await page.getByRole('button', { name: '切换当前内容' }).click(); await page.getByRole('menuitem', { name: '新对话', exact: true }).click();
     await page.getByRole('button', { name: '更多输入操作' }).click(); await page.getByRole('button', { name: /^开启自主识别画面/ }).click();

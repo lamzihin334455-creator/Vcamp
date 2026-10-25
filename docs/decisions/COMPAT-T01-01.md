@@ -4,7 +4,7 @@
 
 本决定只处理 T01 最低 Chrome 版本的实机证据缺口。固定候选为 `d937f6f73495dae718d5bf06db2050149e2b8e7c`；当前版本安装、API 缺失模拟和源码评估不能证明 Chrome 116—119 整体兼容。STD-01 已经修复并经独立复审关闭，不重新列为开放代码缺陷。
 
-2026-10-13 用户原文“同意延期或降低优先级”由总控在 [W0-T01-QA-03](../launch/dispatches/W0-T01-QA-03.md) 及 [W0-T01-MERGE-01](../launch/dispatches/W0-T01-MERGE-01.md) 明确解释为延期至 R1，允许本次 T01/G0 通过。原始用户文字归档见 [manual-signoff.md](../reports/T01/d937f6f73495/qa/evidence/manual-signoff.md)，来源提交 `341904140bb6edef0b85f7021c3f82decacb6519`；原始编排记录与复制哈希见 [dispatch-sources.json](../reports/integration/14163b7ee5ab/evidence/dispatch-sources.json)。这是已授权延期，不是兼容通过或 manifest 变更。
+2026-10-13 用户原文“同意延期或降低优先级”由总控在 W0-T01-QA-03（历史内部记录，未纳入公开源码：`../launch/dispatches/W0-T01-QA-03.md`） 及 W0-T01-MERGE-01（历史内部记录，未纳入公开源码：`../launch/dispatches/W0-T01-MERGE-01.md`） 明确解释为延期至 R1，允许本次 T01/G0 通过。原始用户文字归档见 manual-signoff.md（历史内部记录，未纳入公开源码：`../reports/T01/d937f6f73495/qa/evidence/manual-signoff.md`），来源提交 `341904140bb6edef0b85f7021c3f82decacb6519`；原始编排记录与复制哈希见 dispatch-sources.json（历史内部记录，未纳入公开源码：`../reports/integration/14163b7ee5ab/evidence/dispatch-sources.json`）。这是已授权延期，不是兼容通过或 manifest 变更。
 
 | 责任／检查点 | 要求 |
 | --- | --- |

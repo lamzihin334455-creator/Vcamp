@@ -46,7 +46,7 @@ for(const termsResponse of ['recorded','user-failure'] as const)test(`installed 
    }) as typeof fetch;
   },replies);
   const command=(operation:any)=>page.evaluate(operation=>chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation}),operation);
-  await command({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'SYNTHETIC_REPLAY_KEY'});const provider=await command({type:'provider.fetch',expectedRevision:1});await command({type:'provider.default',expectedRevision:provider.view.provider.revision,modelId:'deepseek-flash'});
+  await command({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'SYNTHETIC_REPLAY_KEY'});const provider=await command({type:'provider.fetch',expectedRevision:1});await command({type:'provider.import-models',expectedRevision:provider.view.provider.revision,modelIds:['deepseek-flash']});
   const subtitle=(await command({type:'subtitles.query',workspaceId:fixture.workspaceId})).view.subtitles;
   await command({type:'subtitles.source.select',workspaceId:fixture.workspaceId,expectedRevision:subtitle.sourceRevision,source:{kind:'native',language:'zh-CN'}});
   await page.reload();await expect(page.getByTestId('startup')).toHaveCount(0,{timeout:15000});await page.getByRole('navigation').getByRole('button',{name:'字幕',exact:true}).click();await page.getByRole('button',{name:'字幕设置',exact:true}).click();await page.getByRole('button',{name:'AI 字幕修正',exact:true}).click();

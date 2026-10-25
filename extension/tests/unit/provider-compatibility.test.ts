@@ -222,7 +222,8 @@ test('combined choices distinguish multiple Keys at the same provider and exclud
   const f = setup(async () => Response.json({ data: [{ id: 'org/shared' }, { id: 'image-only', input_modalities: ['image'] }] }));
   let view = await f.service.command({ type: 'provider.save-key', providerId: 'deepseek', key, expectedRevision: 0 });
   view = await f.service.command({ type: 'provider.fetch', expectedRevision: view.revision });
-  view = await f.service.command({ type: 'provider.import-models', modelIds: ['org/shared', 'image-only'], expectedRevision: view.revision });
+  await expect(f.service.command({ type: 'provider.import-models', modelIds: ['org/shared', 'image-only'], expectedRevision: view.revision })).rejects.toMatchObject({code:'model-unavailable'});
+  view = await f.service.command({ type: 'provider.import-models', modelIds: ['org/shared'], expectedRevision: view.revision });
   view = await f.service.command({ type: 'provider.save-key', providerId: 'deepseek', key: 'SYNTHETIC_OTHER_ACCOUNT', expectedRevision: view.revision });
   view = await f.service.command({ type: 'provider.fetch', expectedRevision: view.revision });
   view = await f.service.command({ type: 'provider.import-models', modelIds: ['org/shared'], expectedRevision: view.revision });

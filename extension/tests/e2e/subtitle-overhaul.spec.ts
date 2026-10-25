@@ -29,7 +29,7 @@ test('module headers give space to content/actions; subtitle tracks and settings
       for(const key of ['x','y','width','height'] as const)expect(Math.abs(after![key]-before![key]),'settings do not displace the timeline; allow subpixel module animation').toBeLessThan(1);
       expect(await popover.evaluate(el=>{const r=el.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.bottom<=innerHeight&&el.scrollWidth<=el.clientWidth+1;})).toBe(true);
       await expect(popover.getByLabel('跟随播放',{exact:true})).toBeChecked();
-      await expect(popover.getByRole('button',{name:'刷新并跟随',exact:true})).toBeEnabled();
+      await expect(page.locator('.titlebar').getByRole('button',{name:'刷新',exact:true})).toBeEnabled();
       if(width===360)await page.screenshot({path:resolve(output,'settings-360.png')});
       if(height===360)await page.screenshot({path:resolve(output,'settings-short.png')});
       await page.keyboard.press('Escape');await expect(popover).toHaveCount(0);

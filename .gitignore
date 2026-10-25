@@ -7,12 +7,14 @@ test-results*/
 playwright-report/
 .profiles/
 .tmp/
+.tmp-*
 .env
 .env.*
 !.env.example
 *.log
+.audit.json
 *.tsbuildinfo
-release/
+/release/
 out/
 *.pem
 *.key

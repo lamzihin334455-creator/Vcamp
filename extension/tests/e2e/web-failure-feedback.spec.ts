@@ -20,7 +20,7 @@ test('web HTTP failure persists safe diagnostics with copy, download and clipboa
     const command=(operation:any)=>page.evaluate(operation=>chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation}),operation);
     await command({type:'provider.save-key',providerId:'deepseek',expectedRevision:0,key:'SYNTHETIC_FEEDBACK_KEY'});
     let provider=await command({type:'provider.fetch',expectedRevision:1});provider=await command({type:'provider.import-models',expectedRevision:provider.view.provider.revision,modelIds:provider.view.provider.catalog.map((model:any)=>model.id)});
-    await command({type:'provider.default',expectedRevision:provider.view.provider.revision,modelId:'deepseek-flash'});
+    await command({type:'provider.import-models',expectedRevision:provider.view.provider.revision,modelIds:['deepseek-flash']});
     await page.reload();await site.bringToFront();
     await page.getByRole('button',{name:'切换当前内容'}).click();await page.getByRole('menuitem',{name:'新对话',exact:true}).click();
     await page.getByRole('button',{name:'联网',exact:true}).click();

@@ -74,7 +74,7 @@ test('roles live in settings, templates carry data policy, and both freeze into 
     await page.getByRole('button', { name: '创建模板', exact: true }).click();
     await page.getByRole('button', { name: '删除模板', exact: true }).click();
     await page.getByRole('button', { name: '确认删除模板', exact: true }).click();
-    await expect(page.locator('.template-manager').getByRole('status')).toContainText('模板已从列表删除');
+    await expect(page.locator('.template-manager').getByRole('status').filter({hasText:'模板已从列表删除'})).toContainText('模板已从列表删除');
     await page.getByRole('button', { name: /^返回/ }).click();
 
     await page.getByLabel('输入草稿').fill('@知识笔记');

@@ -1,7 +1,5 @@
 import {Component, useCallback, useLayoutEffect, useRef, useState, type ReactNode} from 'react';
-import {Player, type PlayerRef} from '@remotion/player';
 import {Launch} from './Launch';
-import {DURATION,FPS} from './brand';
 
 type PanelOpened = {windowId:number;path:string};
 type PanelEvent = {addListener:(listener:(info:PanelOpened)=>void)=>void;removeListener:(listener:(info:PanelOpened)=>void)=>void};
@@ -54,18 +52,19 @@ function StartupPlayback({onFinish}:{onFinish:()=>void}) {
     return color==='rgba(0, 0, 0, 0)' ? '#f5f5f3' : color;
   });
   const host=useRef<HTMLDivElement>(null);
-  const player=useRef<PlayerRef>(null);
+  const [seconds,setSeconds]=useState(0);
   useLayoutEffect(()=>{
     const element=host.current;
-    const current=player.current;
-    if(!element||!current)return;
+    if(!element)return;
     let closing=false;
+    let frame=0;
+    const started=performance.now();
     let fade:Animation|undefined;
     const finish=onFinish;
     const fadeOut=()=>{
       if(closing)return;
       closing=true;
-      current.pause();
+      cancelAnimationFrame(frame);
       // A stalled player or a changed accessibility preference still exits gently.
       fade=element.animate([{opacity:1},{opacity:0}],{duration:180,easing:'ease-in-out',fill:'forwards'});
       fade.onfinish=finish;
@@ -74,24 +73,27 @@ function StartupPlayback({onFinish}:{onFinish:()=>void}) {
     const motionChange=()=>{if(motion.matches)fadeOut();};
     const observer=new ResizeObserver(([entry])=>setSize({width:Math.max(1,Math.round(entry.contentRect.width)),height:Math.max(1,Math.round(entry.contentRect.height))}));
     observer.observe(element);
-    current.addEventListener('ended',finish);
+    const tick=(now:number)=>{
+      if(closing)return;
+      const elapsed=(now-started)/1000;
+      if(elapsed>=(reduced?.22:1.28)){finish();return;}
+      setSeconds(elapsed);
+      frame=requestAnimationFrame(tick);
+    };
+    frame=requestAnimationFrame(tick);
     motion.addEventListener('change',motionChange);
     const deadline=setTimeout(fadeOut,reduced?300:1320);
-    // Layout listeners are ready before the Player's autoplay effect begins.
+    // The deadline also removes the overlay if frame delivery stalls.
     return()=>{
       clearTimeout(deadline);
       if(fade){fade.onfinish=null;fade.cancel();}
       observer.disconnect();
-      current.removeEventListener('ended',finish);
+      cancelAnimationFrame(frame);
       motion.removeEventListener('change',motionChange);
     };
   },[onFinish,reduced]);
   return <div ref={host} data-testid="startup" aria-hidden="true" style={{position:'fixed',inset:0,zIndex:2147480000,pointerEvents:'none',overflow:'hidden'}}>
-    <Player ref={player} component={Launch} inputProps={{dark:false,reducedMotion:reduced,background}}
-      durationInFrames={reduced?15:DURATION} fps={FPS} compositionWidth={size.width} compositionHeight={size.height}
-      style={{width:'100%',height:'100%',pointerEvents:'none'}} controls={false} loop={false}
-      autoPlay initiallyMuted numberOfSharedAudioTags={0} moveToBeginningWhenEnded={false}
-      clickToPlay={false} doubleClickToFullscreen={false} spaceKeyToPlayOrPause={false} acknowledgeRemotionLicense/>
+    <Launch seconds={seconds} width={size.width} height={size.height} dark={false} reducedMotion={reduced} background={background}/>
   </div>;
 }
 

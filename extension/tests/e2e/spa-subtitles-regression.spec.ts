@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 
 for (const scenario of ['mirror', 'full-resource-buffer', 'refresh']) test(`season navigation reads complete subtitles: ${scenario}`, async () => {
   const refresh = scenario === 'refresh';
-  const bundle = resolve(process.env.VCAMP_SPA_BUNDLE ?? 'dist');
+  const bundle = resolve(process.env.VCAMP_SPA_BUNDLE ?? process.env.EXPERIENCE_BUNDLE ?? 'dist');
   const context = await chromium.launchPersistentContext('', {
     channel: 'chromium', headless: true,
     args: [`--load-extension=${bundle}`, `--disable-extensions-except=${bundle}`]
