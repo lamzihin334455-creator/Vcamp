@@ -27,9 +27,10 @@ test('local anchor stays in generated document rather than navigating srcdoc',as
   }finally{await context.close();}
 });
 
-test('production permission lifecycle and cover rendering with controlled site fixtures',async()=>{
-  test.setTimeout(60000);const output=resolve('../.tmp/opt-function');await mkdir(output,{recursive:true});const metadata=JSON.parse(await readFile(resolve('tests/fixtures/cover-metadata.json'),'utf8')),bundle=resolve(process.env.EXPERIENCE_BUNDLE??'dist'),profile=await mkdtemp(resolve(output,'permissions-'));
-  const context=await chromium.launchPersistentContext(profile,{channel:'chromium',headless:true,viewport:{width:420,height:850},args:[`--load-extension=${bundle}`,`--disable-extensions-except=${bundle}`]});
+for(const browserLanguage of ['zh-CN','en-US']){
+test(`production permission lifecycle and cover rendering with controlled site fixtures (${browserLanguage})`,async()=>{
+  test.setTimeout(60000);const output=resolve('../.tmp/opt-function',browserLanguage);await mkdir(output,{recursive:true});const metadata=JSON.parse(await readFile(resolve('tests/fixtures/cover-metadata.json'),'utf8')),bundle=resolve(process.env.EXPERIENCE_BUNDLE??'dist'),profile=await mkdtemp(resolve(output,'permissions-'));
+  const context=await chromium.launchPersistentContext(profile,{channel:'chromium',headless:true,locale:browserLanguage,viewport:{width:420,height:850},args:[`--load-extension=${bundle}`,`--disable-extensions-except=${bundle}`,`--lang=${browserLanguage}`]});
   try{
     await context.route('https://api.bilibili.com/x/web-interface/view**',r=>r.fulfill({contentType:'application/json',body:JSON.stringify({code:0,data:{aid:1,bvid:metadata.videoId,title:metadata.title,pic:metadata.coverUrl,desc:'受控权限与封面夹具',pages:metadata.pages}})}));
     await context.route(metadata.coverUrl,r=>r.fulfill({contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+j4xkAAAAASUVORK5CYII=','base64')}));
@@ -44,13 +45,14 @@ test('production permission lifecycle and cover rendering with controlled site f
     const saved=await panel.evaluate(async()=>{const query=await chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation:{type:'workspace.query'}});return chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation:{type:'scribble.create',workspaceId:query.view.workspaceId,text:'封面与权限验证资料',time:null}});});expect(saved.ok).toBe(true);
     await panel.getByRole('button',{name:'资料库',exact:true}).click();const img=panel.locator('.library-cover img');await expect(img).toHaveCount(1);await expect.poll(()=>img.evaluate((el:HTMLImageElement)=>el.naturalWidth),{timeout:20000}).toBeGreaterThan(0);await expect(img).toHaveAttribute('src',metadata.coverUrl);const naturalWidth=await img.evaluate((el:HTMLImageElement)=>el.naturalWidth);await panel.screenshot({path:resolve(output,'controlled-cover.png')});
     const management=await context.newPage();await management.goto(`chrome://extensions/?id=${id}`);await writeFile(resolve(output,'site-access-ui.txt'),await management.locator('body').ariaSnapshot());
-    const automatic=management.getByRole('button',{name:'自动允许访问以下网站 详细了解扩展程序的权限'});await automatic.click();const access=management.getByRole('button',{name:'https://www.bilibili.com/*',exact:true});await expect(access).toBeEnabled();
+    const automatic=management.getByRole('button',{name:/^(?:自动允许访问以下网站|Automatically allow access on the following sites) /});await expect(automatic).toHaveAccessibleName(browserLanguage==='zh-CN'?/^自动允许访问以下网站 /:/^Automatically allow access on the following sites /);await expect(automatic).toHaveAttribute('aria-pressed','true');await automatic.click();await expect(automatic).toHaveAttribute('aria-pressed','false');const access=management.getByRole('button',{name:'https://www.bilibili.com/*',exact:true});await expect(access).toBeEnabled();
     await site.reload();await site.bringToFront();await panel.getByRole('button',{name:'问答',exact:true}).click();await expect(panel.locator('.context-current-button .sr-only')).toHaveText('浏览器未允许读取 B 站');await expect(panel.getByRole('button',{name:'恢复浏览器站点访问'})).toBeVisible();
     await access.click();await site.reload();await site.bringToFront();await expect(panel.locator('.context-current-button .sr-only')).toHaveText('浏览器未允许访问字幕站点');
     await automatic.click();await site.reload();await site.bringToFront();await expect(panel.locator('.context-current-button .sr-only')).toHaveText('完整字幕已就绪');
     await writeFile(resolve(output,'permission-cover.json'),JSON.stringify({productionManifest:true,firstOpen:true,reopen:true,sameHostPartSwitch:true,browserUIRevocation:true,subtitleHostRevocation:true,browserUIRestoration:true,cover:{controlledFixture:true,host:new URL(metadata.coverUrl).host,naturalWidth},siteAndSubtitles:'controlled fixtures; cover metadata and image controlled fixtures',modelCalls:0,keyRead:false},null,2));
   }finally{await context.close();}
 });
+}
 
 test('installed combination: bound time, dynamic anchors, guarded navigation, selection ZIP and portable HTML',async()=>{
   test.setTimeout(60000);
