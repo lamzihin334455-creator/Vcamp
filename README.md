@@ -4,7 +4,9 @@ Chrome 侧栏中的视频学习工作台：字幕、问答、笔记、交互学�
 
 AI 功能使用你自己的 API Key，费用由服务商收取；资料保存在本机，没有项目自建账号或云同步。
 
-**v1.0 发布工程进行中，尚未公开发布。** 验证状态见 [发布记录](docs/release/status.md) 与 [候选验收](docs/release/validation.md)。GitHub 自动生成的源码 ZIP 不是浏览器安装包。
+**v1.0.0** · [下载安装包](https://github.com/lamzihin334455-creator/Vcamp/releases/download/v1.0.0/Vcamp-1.0.0.zip) · [校验值](https://github.com/lamzihin334455-creator/Vcamp/releases/download/v1.0.0/SHA256SUMS.txt) · [Release 与最终验收](https://github.com/lamzihin334455-creator/Vcamp/releases/tag/v1.0.0)
+
+支持桌面 Chrome/Chromium 149 及以上。下载后解压，再加载已解压的扩展；GitHub 自动生成的 Source code ZIP 不是浏览器安装包。
 
 ## 开始使用
 
@@ -14,6 +16,12 @@ AI 功能使用你自己的 API Key，费用由服务商收取；资料保存在
 4. 在资料库保存和导出学习资料，定期下载备份。
 
 支持 DeepSeek、阿里云百炼、商汤日日新及自定义 OpenAI 兼容 HTTPS 服务。第三方连接目前仅开放文本；视觉和联网仅在满足条件的 DeepSeek 官方连接下提供。模型与额度以服务商实际返回为准，详见 [API 配置](docs/api-settings.md)。无字幕或画面证据不足时不能保证理解完整视频，生成内容应结合原视频核对。
+
+## 角色与任务模板
+
+角色依次为：简洁直接、标准、深度分析、通俗易懂。用于设置回答的详略与侧重点，也可自定义角色身份和表达风格；在“角色设置 → 应用范围”中开启后，笔记和 HTML 也会使用当前角色的表达偏好。
+
+任务模板依次为：快速总结、坐标传送门、健康度检测、独立阅读文档、风格化交互页面，分别输出 Chat、Chat、Chat、Markdown 和 HTML。角色与模板都可编辑；已有请求保留发送时的版本。默认配置依据见 [内置目录](docs/release/default-presets.md)。
 
 ## 开发与构建
 

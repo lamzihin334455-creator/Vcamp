@@ -1,4 +1,6 @@
-# GitHub 准备与发布门禁
+# GitHub 治理与发布流程
+
+以下保留首次上传时的准备状态；正式发布后的实际治理设置和检查结果见 [v1.0.0 Release](https://github.com/lamzihin334455-creator/Vcamp/releases/tag/v1.0.0)。
 
 GitHub CLI 已成功认证。目标仓库为 [lamzihin334455-creator/Vcamp](https://github.com/lamzihin334455-creator/Vcamp)，origin 已配置；目前保持私有，用于完整 CI 与发布门禁验证。维护者确认授权后浏览器回跳出现 404，但 CLI 成功取得认证，GitHub API 也确认账号有效，因此没有重复申请凭据。以下治理配置仍需逐项启用并核验，不能视为已生效。视频继续暂停。
 
@@ -8,7 +10,7 @@ GitHub CLI 已成功认证。目标仓库为 [lamzihin334455-creator/Vcamp](http
 
 主分支 ruleset：禁止 force push 和删除；合并前检查必须通过、分支需更新、讨论需解决。单人维护可以保留紧急修复通道，但必须留下变更与回归记录。外部 PR 使用只读 contents 权限，不接收真实 API Key，不采用 pull_request_target 执行外部代码。
 
-启用 Settings → Security → Private vulnerability reporting，核对 Security 页的私密报告入口，再更新 SECURITY.md 的真实链接。启用依赖图、Dependabot alerts，并结合可用能力配置 secret scanning。平台或套餐不支持的能力应明确记录。
+仓库转为公开后，启用 Settings → Security → Private vulnerability reporting，核对 Security 页的私密报告入口，再更新 SECURITY.md 的真实链接。启用依赖图、Dependabot alerts，并结合可用能力配置 secret scanning。平台或套餐不支持的能力应明确记录。
 
 ## Release 与链接
 
@@ -16,7 +18,7 @@ GitHub CLI 已成功认证。目标仓库为 [lamzihin334455-creator/Vcamp](http
 
 Release 正文说明支持的浏览器/站点、Key 自备、已验证范围、升级备份步骤、已知限制和安装指引。上传浏览器 ZIP、build-manifest.json、SHA256SUMS.txt，视频素材按用户后续决定处理。GitHub 自动源码归档与浏览器包区别明确。
 
-公开后以未登录浏览器检查 README、LICENSE、Security、Release、安装下载链接；重新下载 ZIP 对照 SHA-256并用隔离 profile 安装。只有真实线上链接与已启用设置才能关闭 P60/P61。
+公开后以未登录浏览器检查 README、LICENSE、Security、Release、安装下载链接；重新下载 ZIP 对照 SHA-256并用隔离 profile 安装。只有真实线上链接与已启用设置才能关闭 P60/P61。GitHub 的私密漏洞报告限公开仓库，因此顺序为：完成源码审查和 CI → 公开源码 → 立即启用并验证私密报告及主分支保护 → 发布正式 Release。安全入口验证完成前不发布正式安装资产。
 
 ## 热修复与回退
 

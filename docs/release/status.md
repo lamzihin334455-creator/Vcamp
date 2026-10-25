@@ -1,17 +1,17 @@
-# v1.0 发布状态
+# v1.0 验证与发布记录
 
-本地技术候选已生成，尚未发布 GitHub Release。GitHub CLI 已认证并建立 [Vcamp 私有暂存仓库](https://github.com/lamzihin334455-creator/Vcamp)，用于运行完整 CI；公开和治理门禁尚未完成。公开基线为 `fe026729becdd20d34ea8ac2f9b6d5dc4b2907d9`；原工程和完整恢复材料位于公开仓库之外。结果、命令、哈希和限制见 [候选验收](validation.md)，逐项进度见 [执行台账](task-status.md)。
+正式安装包、校验值、构建来源和最终验收结果统一保存在 [v1.0.0 Release](https://github.com/lamzihin334455-creator/Vcamp/releases/tag/v1.0.0)。完整线上检查见 [checks](https://github.com/lamzihin334455-creator/Vcamp/actions/workflows/ci.yml)。本文保留发布前已取得的证据，线上状态与最终资产以 Release 为准。
 
-用户于 2026-10-26 暂缓产品演示视频，后续另议方法。随后已按维护者提供的配置备份落实 4 个角色、5 个模板及其排序，并调整角色管理界面；配置依据见 [内置目录](default-presets.md)。RC.2 的增量验收见 [RC.2 记录](rc.2-validation.md)。视频暂停不阻塞技术检查。以下 RC.1 全量验收保留为历史证据。
+公开源码从筛选后的基线 `fe026729becdd20d34ea8ac2f9b6d5dc4b2907d9` 建立；原工程、完整历史恢复材料、ENV 和用户完整备份保存在公开仓库之外。Standards 与 Spec 两条基线审查分别见 [Standards](standards-review.md) 和 [Spec](spec-review.md)。审查覆盖重点边界，不等同于全仓逐行证明。
 
-Standards 与 Spec 保留独立报告：[Standards](standards-review.md)、[Spec](spec-review.md)。尚无确认的 P0/P1。5 项必要 P2 已修复并补回归：随笔导出范围、文本模型的图片历史、非文本模型录入、长文导出、超容量备份。Zod 已升级，扩展启动动效移除全部 Remotion 运行依赖。自有代码 MIT，110 个生产依赖为 MIT/ISC，依赖审计 0 漏洞。
+已确认问题中没有 P0/P1；5 项必要 P2 已修复并补回归，详见 [修复清单](fixes.md)。自有代码 MIT；110 个生产依赖为 MIT/ISC，扩展运行时已移除 Remotion。模型使用与独立复审的服务限制见 [实际执行记录](model-execution.md)。
 
-类型检查通过，单测 677 通过、0 失败、3 条件跳过。浏览器完整运行 171 通过、1 失败、3 条件跳过；唯一失败为候选 package 版本与 Chrome 数值版本的测试断言不一致，修正后该用例定向复跑通过。172 个非条件浏览器用例均有通过证据，但没有将两次运行合写成一次整套全绿；最终整套 CI 仍待执行。
+当前默认目录严格采用维护者确认的 4 个角色和 5 个模板，原文、顺序及来源见 [内置目录](default-presets.md)。RC.2 本地验证为 678 项单测通过、3 条件跳过，23 项相关浏览器回归通过；原候选完整运行与失败修正不能拼接成一次全绿，详见 [RC.1 记录](validation.md) 与 [RC.2 记录](rc.2-validation.md)。正式版本由独立完整 CI 再验证。
 
-独立干净检出构建和重复构建 ZIP 字节一致，生产候选为 `1.0.0-rc.1`，Chrome 数值版本 `1.0.0`，最低声明 149。最终 ZIP 的全新安装、重启配置/草稿/随笔持久化及 0.1.82 同路径升级身份和资料保留均通过。约 80 MB 私有旧备份恢复、去重和重新导出通过；浏览器大于 64 MiB 的合成 Unicode 备份下载与异 profile 恢复通过。
+维护者于 2026-10-26 在 zihin 浏览器手动完成 RC.2 安装，打开真实有字幕视频，确认字幕可读、角色及模板顺序正确；提供的截图显示 848 条中文 ai-zh 字幕。此项为维护者人工确认，未伪记为工具自动验收。截图包含真实站点内容，只保存在私有验收目录。最终版与该候选的产品代码一致，仅收敛版本、文档和发布配置；最终 ZIP 仍须另行通过安装及升级检查。
 
-真实 DeepSeek 使用 4 / 300 次请求（目录、问答、Markdown、HTML），仅合成 LRU 教材。实际生成 HTML 的正误选择、重置与离线交互检查通过。无登录真实 Bilibili 新环境返回字幕 auth-failed，不能关闭真实字幕可用性门禁，也不声称所有服务商实网质量均已通过。
+真实 DeepSeek 样本累计使用 4 / 300 次请求，材料为自制合成教材，问答、Markdown 和 HTML 的实际响应及 HTML 离线交互已验证。本轮默认配置调整和发布自动化不消耗真实模型 API。该证据不代表所有站点、服务商或生成内容质量都已覆盖。
 
-剩余发布条件：最终整套 CI、登录条件下真实站点字幕、最终公开资产复查、GitHub 认证和目标仓库配置。当前未登录、无 remote、分支保护或有效私密漏洞入口，尚不能公开发布。视频单独暂停。
+GitHub 认证成功，目标仓库为 [lamzihin334455-creator/Vcamp](https://github.com/lamzihin334455-creator/Vcamp)。发布流程先在私有仓库完成完整 CI，再公开源码、配置主分支保护及私密漏洞报告入口、发布正式资产，最后用未登录访问与重新下载完成复验。治理操作与最终结果写入 Release 验收报告。
 
-模型实际记录见 [model-execution.md](model-execution.md)。修复后独立 Astra 复审被模型服务自动安全审核拒绝，该次独立复审未完成；本地验证不替代该项独立复审。
+产品演示视频由维护者暂缓，后续另议制作方法；不进入本次技术发布的完成范围。Chrome Web Store 上架、新站点、ASR Lab 与 Studio Lab 均不在此次发布范围。
