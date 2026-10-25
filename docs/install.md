@@ -2,7 +2,7 @@
 
 目前尚无公开 Release 下载地址，可按根 README 从源码构建。正式发布时下载 `Vcamp-版本.zip` 浏览器包，而不是 GitHub 自动生成的 Source code ZIP。
 
-当前候选为 `Vcamp-1.0.0-rc.1.zip`，支持桌面 Chrome/Chromium 149 及以上；本轮完整自动化运行于 Chromium 149.0.7827.55。其它浏览器与更新版本需结合兼容验收记录，不能把版本下限理解为所有 Chromium 衍生浏览器都已测试。
+当前候选为 `Vcamp-1.0.0-rc.1.zip`，支持桌面 Chrome/Chromium 149 及以上；本轮安装和主要自动化检查运行于 Chromium 149.0.7827.55。其它浏览器与更新版本需结合兼容验收记录，不能把版本下限理解为所有 Chromium 衍生浏览器都已测试。
 
 ## 安装
 

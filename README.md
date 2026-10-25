@@ -4,7 +4,7 @@ Chrome 侧栏中的视频学习工作台：字幕、问答、笔记、交互学�
 
 AI 功能使用你自己的 API Key，费用由服务商收取；资料保存在本机，没有项目自建账号或云同步。
 
-**v1.0 发布工程进行中，尚未公开发布。** 验证状态见 [发布记录](docs/release/status.md)。GitHub 自动生成的源码 ZIP 不是浏览器安装包。
+**v1.0 发布工程进行中，尚未公开发布。** 验证状态见 [发布记录](docs/release/status.md) 与 [候选验收](docs/release/validation.md)。GitHub 自动生成的源码 ZIP 不是浏览器安装包。
 
 ## 开始使用
 
