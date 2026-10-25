@@ -36,7 +36,9 @@ test('web HTTP failure persists safe diagnostics with copy, download and clipboa
     await savedTask.getByRole('button',{name:'复制完整诊断',exact:true}).click();
     await expect(savedTask.getByRole('status')).toHaveText('完整诊断已复制');
     const copied=await page.evaluate(()=>(window as any).copiedFeedback);
-    expect(JSON.parse(copied)).toMatchObject({format:'vcamp-failure-feedback-v1',appVersionAtExport:JSON.parse(await readFile('package.json','utf8')).version,error:'web-tool',diagnosticStatus:'recorded',diagnostics:expect.arrayContaining([expect.objectContaining({httpStatus:400,webServiceError:'invalid_request_error',webFailure:'request-rejected',webAdapterVersion:3})])});
+    // Diagnostics report Chrome's numeric installed version; prerelease labels
+    // live in manifest.version_name and need not equal package.json's version.
+    expect(JSON.parse(copied)).toMatchObject({format:'vcamp-failure-feedback-v1',appVersionAtExport:JSON.parse(await readFile('public/manifest.json','utf8')).version,error:'web-tool',diagnosticStatus:'recorded',diagnostics:expect.arrayContaining([expect.objectContaining({httpStatus:400,webServiceError:'invalid_request_error',webFailure:'request-rejected',webAdapterVersion:3})])});
     expect(copied).not.toMatch(/PRIVATE_|SYNTHETIC_FEEDBACK_KEY/);
     const pending=page.waitForEvent('download');await savedTask.getByRole('button',{name:'下载诊断文件',exact:true}).click();
     const download=await pending;expect(download.suggestedFilename()).toMatch(/^vcamp-error-.*\.json$/);
