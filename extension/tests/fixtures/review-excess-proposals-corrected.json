@@ -1,0 +1,183 @@
+{
+  "version": 3,
+  "results": [
+    {
+      "evidenceId": "e1",
+      "checks": [
+        {
+          "checkId": "c0",
+          "status": "confirmed",
+          "imageRefs": [
+            "i0"
+          ],
+          "observation": "画面可见自制卡片 361 的外框及顶部标记"
+        },
+        {
+          "checkId": "c1",
+          "status": "confirmed",
+          "imageRefs": [
+            "i0"
+          ],
+          "observation": "画面可见自制卡片 362 的外框及顶部标记"
+        },
+        {
+          "checkId": "c2",
+          "status": "uncertain",
+          "imageRefs": [
+            "i0"
+          ],
+          "observation": "自制卡片 363 的细线标记模糊，暂不能确认"
+        }
+      ],
+      "refinements": [
+        {
+          "slotKey": "e1_0",
+          "cueIds": [
+            28,
+            29,
+            30,
+            31
+          ],
+          "checkIds": [
+            "c2"
+          ],
+          "reason": "按合成字幕定位自制卡片 348，仅核对已提供的图像"
+        }
+      ]
+    },
+    {
+      "evidenceId": "e2",
+      "checks": [
+        {
+          "checkId": "c0",
+          "status": "unreadable",
+          "imageRefs": [
+            "i1"
+          ],
+          "observation": "自制卡片 364 的细线标记模糊，暂不能确认"
+        },
+        {
+          "checkId": "c1",
+          "status": "confirmed",
+          "imageRefs": [
+            "i1"
+          ],
+          "observation": "画面可见自制卡片 350 的外框及顶部标记"
+        },
+        {
+          "checkId": "c2",
+          "status": "unreadable",
+          "imageRefs": [
+            "i1"
+          ],
+          "observation": "自制卡片 365 的细线标记模糊，暂不能确认"
+        }
+      ],
+      "refinements": [
+        {
+          "slotKey": "e2_0",
+          "cueIds": [
+            37,
+            38,
+            39,
+            40
+          ],
+          "checkIds": [
+            "c0",
+            "c2"
+          ],
+          "reason": "按合成字幕定位自制卡片 352，仅核对已提供的图像"
+        }
+      ]
+    },
+    {
+      "evidenceId": "e3",
+      "checks": [
+        {
+          "checkId": "c0",
+          "status": "confirmed",
+          "imageRefs": [
+            "i2"
+          ],
+          "observation": "画面可见自制卡片 366 的外框及顶部标记"
+        },
+        {
+          "checkId": "c1",
+          "status": "confirmed",
+          "imageRefs": [
+            "i2"
+          ],
+          "observation": "画面可见自制卡片 354 的外框及顶部标记"
+        }
+      ],
+      "refinements": []
+    },
+    {
+      "evidenceId": "e4",
+      "checks": [
+        {
+          "checkId": "c0",
+          "status": "confirmed",
+          "imageRefs": [
+            "i3"
+          ],
+          "observation": "画面可见自制卡片 367 的外框及顶部标记"
+        },
+        {
+          "checkId": "c1",
+          "status": "confirmed",
+          "imageRefs": [
+            "i3"
+          ],
+          "observation": "画面可见自制卡片 368 的外框及顶部标记"
+        }
+      ],
+      "refinements": []
+    },
+    {
+      "evidenceId": "e6",
+      "checks": [
+        {
+          "checkId": "c0",
+          "status": "not-visible",
+          "imageRefs": [
+            "i4"
+          ],
+          "observation": "画面可见自制卡片 357 的外框及顶部标记"
+        },
+        {
+          "checkId": "c1",
+          "status": "not-visible",
+          "imageRefs": [
+            "i4"
+          ],
+          "observation": "画面可见自制卡片 358 的外框及顶部标记"
+        },
+        {
+          "checkId": "c2",
+          "status": "confirmed",
+          "imageRefs": [
+            "i4"
+          ],
+          "observation": "画面可见自制卡片 359 的外框及顶部标记"
+        }
+      ],
+      "refinements": [
+        {
+          "slotKey": "e6_0",
+          "cueIds": [
+            234,
+            236,
+            237,
+            238
+          ],
+          "checkIds": [
+            "c0",
+            "c1"
+          ],
+          "reason": "按合成字幕定位自制卡片 369，仅核对已提供的图像"
+        }
+      ]
+    }
+  ]
+}

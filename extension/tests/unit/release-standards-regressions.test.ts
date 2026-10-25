@@ -1,0 +1,30 @@
+import 'fake-indexeddb/auto';
+import {test,expect,vi} from 'vitest';
+import {IndexedWorkspaceStore} from '../../src/data/indexed-store';
+import {IndexedGenerationStore} from '../../src/data/generation-store';
+import {IndexedAttachmentStore} from '../../src/data/attachment-store';
+import {createTaskService,type TaskHost} from '../../src/generation/task-service';
+import type {ProviderService} from '../../src/contracts/provider';
+import {subtitleBasis} from '../../src/generation/subtitle-context';
+import {png} from '../fixtures/png';
+
+test('retry rejects a frozen image request after its model loses vision without adding an attempt',async()=>{
+  const name=crypto.randomUUID(),spaces=new IndexedWorkspaceStore(name),jobs=new IndexedGenerationStore(name),images=new IndexedAttachmentStore(name);
+  const source={platform:'bilibili' as const,videoId:'BVretry',partId:'1',title:'retry'};
+  const opened=await spaces.open(source),target={kind:'chat' as const,workspaceId:opened.id,chatId:opened.chatId};
+  const binding={platform:'bilibili' as const,videoId:source.videoId,partId:source.partId,tabId:1,documentId:'doc',epoch:1};
+  const cues=[{from:0,to:1,content:'完整字幕'}];
+  await images.upload(target,binding,0,'diagram.png',{dataUrl:png(),width:2,height:2,time:0});
+  const draft=(await spaces.read(opened.id,opened.chatId))!.draft;
+  await spaces.save(opened.id,draft.revision,{...draft,text:'说明图片',modelId:'frozen-model'},opened.chatId);
+  const job=await jobs.freezeChat(target,2,await subtitleBasis(binding,'zh',cues),true);
+  await jobs.finish(job.jobId,job.attempts[0].attemptId,'failed','network');
+  const before=await jobs.get(job.jobId);
+  const create=vi.fn(async()=>1);
+  const host:TaskHost={create,navigate:async()=>{},exists:async()=>false,close:async()=>{}};
+  const provider:ProviderService={command:async()=>({providerId:'deepseek',revision:1,hasKey:true,models:[{id:'frozen-model',name:'Frozen model',text:'declared',vision:'unsupported',web:'unknown'}],defaultModelId:'frozen-model',status:'ready'})};
+  const service=createTaskService(jobs,spaces,provider,async()=>({status:'ready',binding,language:'zh',cues}),host,'extension',()=>{});
+  await expect(service.command({type:'generation.retry',jobId:job.jobId})).rejects.toMatchObject({code:'unsupported-capability'});
+  expect(await jobs.get(job.jobId)).toEqual(before);
+  expect(create).not.toHaveBeenCalled();
+});

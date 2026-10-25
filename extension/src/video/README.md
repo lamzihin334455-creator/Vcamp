@@ -1,0 +1,9 @@
+# T11 subtitle view contract
+
+`VideoView.tracks?` holds normalized native `{language,label,status,cues}` tracks under the **single enclosing binding** (video/part/tab/document/epoch). Each refresh replaces the whole track set through `VideoSessions` revision/abort checks. It is memory-only. `VideoView.cues/language/status` remain the original default analysis track; display choices never update Chat inputs or generation snapshots. No database migration (v5), new permission, or model call.
+
+`SubtitleTimeline` is a data-only React view for T12 reuse: sorted `primary`, optional sorted `auxiliary`, `bilingual`, `fontSize`, optional `playback`, `follow`, `scrollRequest`, optional `onUserScroll/onSeek`. Auxiliary cues match on positive time-interval intersection; multiple overlaps display in order, gaps are explicit. A long auxiliary cue may therefore appear under multiple primary cues. This is timing alignment, not inferred translation. For saved readonly versions omit playback/seek callbacks and use `follow=false`; the view creates no subscriptions or persistence itself.
+
+`NativeSubtitles` owns native track selection and the live subscription. `ApplicationClient.subscribePlayback(binding, listener)` is optional and returns a disposer. Native content events only trigger a bound `VideoPort.playback` read; the channel sends no page-supplied playback data, rejects reader ports, coalesces busy notifications, and drops disposed/replaced replies. Wheel/touch/scrollbar/scroll keys pause follow; programmatic scrolling does not. Return-current restores follow. Timestamp clicks reuse `video.seek(policy=preserve)`.
+
+Only `vcamp.subtitleFontSize` is read/written by `subtitlePreferences`; subtitle bodies and language selections are never persisted. Current-row selection assumes time-sorted native cues and chooses the latest started interval. This batch does not provide AI translation, saved subtitle versions, or reader playback.

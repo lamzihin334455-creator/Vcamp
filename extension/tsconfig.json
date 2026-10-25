@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", "lib": ["ES2022", "DOM", "DOM.Iterable"], "module": "ESNext",
+    "moduleResolution": "Bundler", "jsx": "react-jsx", "strict": true,
+    "noEmit": true, "skipLibCheck": true, "allowImportingTsExtensions": true,
+    "types": ["chrome", "node", "vite/client"], "baseUrl": ".",
+    "paths": { "@binding": ["src/app/unbound.ts"], "@provider-endpoint": ["src/generation/provider-endpoint.ts"], "@generation-video": ["src/generation/test-video-fallback.ts"] }
+  },
+  "include": ["src", "tests", "*.ts"]
+}

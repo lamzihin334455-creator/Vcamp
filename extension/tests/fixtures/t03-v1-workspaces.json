@@ -1,0 +1,14 @@
+[
+  {
+    "id": "[\"bilibili\",\"BVlegacy\",\"10\"]",
+    "chatId": "legacy-chat-a",
+    "source": { "platform": "bilibili", "videoId": "BVlegacy", "partId": "10", "title": "重复标题" },
+    "draft": { "schemaVersion": 1, "revision": 7, "text": "旧数据库中文草稿", "outputType": "markdown", "template": { "templateId": "template-1", "revisionId": "template-r2" }, "referenceIds": ["note-1"], "attachmentIds": ["screenshot-1"], "modelId": "model-1" }
+  },
+  {
+    "id": "[\"bilibili\",\"BVlegacy\",\"20\"]",
+    "chatId": "legacy-chat-b",
+    "source": { "platform": "bilibili", "videoId": "BVlegacy", "partId": "20", "title": "重复标题" },
+    "draft": { "schemaVersion": 1, "revision": 2, "text": "另一分 P 的旧草稿", "outputType": "html", "template": null, "referenceIds": [], "attachmentIds": [], "modelId": null }
+  }
+]

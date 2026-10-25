@@ -1,0 +1,10 @@
+import { z } from 'zod';
+export const cacheKindSchema = z.enum(['video-metadata', 'derived-preview']);
+export type CacheKind = z.infer<typeof cacheKindSchema>;
+export const cacheSelectionSchema = z.object({ olderThanDays: z.number().int().min(1).max(3650), types: z.array(cacheKindSchema).min(1).max(2) }).strict();
+export type CacheSelection = z.infer<typeof cacheSelectionSchema>;
+export const cacheCountsSchema = z.object({ count: z.number().int().nonnegative(), bytes: z.number().int().nonnegative(), videoCount: z.number().int().nonnegative() }).strict();
+export const cachePlanSchema = cacheCountsSchema.extend({ planId: z.string().uuid(), expiresAt: z.number() }).strict();
+export const storageViewSchema = z.object({ inventory: cacheCountsSchema, plan: cachePlanSchema.optional(), result: cacheCountsSchema.optional() }).strict();
+export type CacheCounts = z.infer<typeof cacheCountsSchema>;
+export type CachePreview = z.infer<typeof cachePlanSchema>;

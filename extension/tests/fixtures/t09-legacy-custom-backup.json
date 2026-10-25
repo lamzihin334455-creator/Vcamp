@@ -1,0 +1,89 @@
+{
+  "manifest": {
+    "format": "vcamp-backup",
+    "formatVersion": 2,
+    "databaseVersion": 8,
+    "createdAt": 1792084677207,
+    "types": [
+      "attachments",
+      "workspaces",
+      "jobs",
+      "artifacts",
+      "noteRevisions",
+      "subtitleVersions",
+      "scribbles",
+      "templates",
+      "templateRevisions",
+      "folders",
+      "favorites"
+    ],
+    "checksum": "714fb93706837da365493674441170302fdba145f439d19ec47f11e4fd2cf5fa"
+  },
+  "payload": {
+    "attachments": [],
+    "workspaces": [
+      {
+        "id": "[\"bilibili\",\"BVt05A\",\"A\"]",
+        "source": {
+          "platform": "bilibili",
+          "videoId": "BVt05A",
+          "partId": "A",
+          "title": "A 本地 HTTP 视频"
+        },
+        "recentChatId": "30573c8c-7843-453e-9fc0-9196a14597b1",
+        "chats": [
+          {
+            "id": "30573c8c-7843-453e-9fc0-9196a14597b1",
+            "title": "对话 01",
+            "draft": {
+              "schemaVersion": 1,
+              "revision": 1,
+              "text": "按保存的模板整理视频",
+              "outputType": "html",
+              "template": {
+                "templateId": "013261fc-f896-4e47-a4b6-6081f3afb2de",
+                "revisionId": "9c6dbb31-bcf5-4fbc-88a8-c5446ddee988"
+              },
+              "referenceIds": [],
+              "attachmentIds": [],
+              "modelId": "synthetic-a"
+            }
+          }
+        ],
+        "lastOpenedAt": 1792084677204
+      }
+    ],
+    "jobs": [],
+    "artifacts": [],
+    "noteRevisions": [],
+    "subtitleVersions": [],
+    "scribbles": [],
+    "templates": [
+      {
+        "name": "旧交互页面",
+        "description": "升级前保存",
+        "requirements": "生成完整自包含 HTML 文件，包含 CSS 和可点击展开的 JavaScript。",
+        "outputType": "html",
+        "defaultModelId": "synthetic-a",
+        "id": "013261fc-f896-4e47-a4b6-6081f3afb2de",
+        "revisionId": "9c6dbb31-bcf5-4fbc-88a8-c5446ddee988",
+        "revision": 1,
+        "builtin": false
+      }
+    ],
+    "templateRevisions": [
+      {
+        "name": "旧交互页面",
+        "description": "升级前保存",
+        "requirements": "生成完整自包含 HTML 文件，包含 CSS 和可点击展开的 JavaScript。",
+        "outputType": "html",
+        "defaultModelId": "synthetic-a",
+        "templateId": "013261fc-f896-4e47-a4b6-6081f3afb2de",
+        "revisionId": "9c6dbb31-bcf5-4fbc-88a8-c5446ddee988",
+        "revision": 1
+      }
+    ],
+    "folders": [],
+    "favorites": []
+  }
+}

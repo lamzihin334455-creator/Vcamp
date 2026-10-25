@@ -1,0 +1,492 @@
+{
+  "promptVersion": "synthetic-fixture.v1",
+  "acceptedPlanFromRequest": 22,
+  "mediaMetadata": {
+    "width": 853,
+    "height": 480,
+    "duration": 581.066
+  },
+  "plan": {
+    "version": 2,
+    "scope": "focused",
+    "needsNewFrames": true,
+    "evidence": [
+      {
+        "id": "e1",
+        "need": "核对自制几何卡片 277 的外框、网格与选中标记",
+        "priority": "required",
+        "mode": "single",
+        "reuseAttachmentIds": [],
+        "windows": [
+          {
+            "from": 62.85,
+            "to": 73.93,
+            "anchor": 67.74000000000001,
+            "cueIds": [
+              26,
+              27,
+              28,
+              29,
+              30,
+              31
+            ],
+            "basis": "subtitle"
+          }
+        ],
+        "detailNeed": "overview",
+        "reason": "按合成字幕定位自制卡片 278，仅核对已提供的图像"
+      },
+      {
+        "id": "e2",
+        "need": "核对自制几何卡片 279 的外框、网格与选中标记",
+        "priority": "required",
+        "mode": "single",
+        "reuseAttachmentIds": [],
+        "windows": [
+          {
+            "from": 84.41,
+            "to": 93.549,
+            "anchor": 90.13900000000001,
+            "cueIds": [
+              37,
+              38,
+              39,
+              40
+            ],
+            "basis": "subtitle"
+          }
+        ],
+        "detailNeed": "read-text",
+        "readTargets": [
+          "自制卡片细节 280",
+          "自制卡片细节 281",
+          "自制卡片细节 282"
+        ],
+        "reason": "按合成字幕定位自制卡片 283，仅核对已提供的图像"
+      },
+      {
+        "id": "e3",
+        "need": "核对自制几何卡片 284 的外框、网格与选中标记",
+        "priority": "required",
+        "mode": "single",
+        "reuseAttachmentIds": [],
+        "windows": [
+          {
+            "from": 100.22,
+            "to": 106.04,
+            "anchor": 104.61000000000001,
+            "cueIds": [
+              44,
+              45
+            ],
+            "basis": "subtitle"
+          }
+        ],
+        "detailNeed": "overview",
+        "reason": "按合成字幕定位自制卡片 285，仅核对已提供的图像"
+      },
+      {
+        "id": "e4",
+        "need": "核对自制几何卡片 286 的外框、网格与选中标记",
+        "priority": "optional",
+        "mode": "sequence",
+        "reuseAttachmentIds": [],
+        "windows": [
+          {
+            "from": 333.38,
+            "to": 339.83,
+            "anchor": 337.5,
+            "cueIds": [
+              152,
+              153,
+              154,
+              155
+            ],
+            "basis": "subtitle"
+          },
+          {
+            "from": 339.83,
+            "to": 346.96,
+            "anchor": 343.13,
+            "cueIds": [
+              156,
+              157,
+              158
+            ],
+            "basis": "subtitle"
+          }
+        ],
+        "detailNeed": "overview",
+        "reason": "按合成字幕定位自制卡片 287，仅核对已提供的图像"
+      }
+    ],
+    "unresolved": [
+      "自制卡片核验说明 288",
+      "自制卡片核验说明 289",
+      "自制卡片核验说明 290"
+    ]
+  },
+  "audit": {
+    "version": 1,
+    "qualityVersion": "local-v2",
+    "historyAttachmentIds": [],
+    "slots": [
+      {
+        "key": "e1_0",
+        "evidenceIds": [
+          "e1"
+        ],
+        "group": "e1",
+        "from": 62.85,
+        "to": 73.93,
+        "anchor": 67.74000000000001,
+        "detail": "low",
+        "detailReason": "自制卡片核验说明 291"
+      },
+      {
+        "key": "e2_0",
+        "evidenceIds": [
+          "e2"
+        ],
+        "group": "e2",
+        "from": 84.41,
+        "to": 93.549,
+        "anchor": 90.13900000000001,
+        "detail": "original",
+        "detailReason": "自制卡片核验说明 292"
+      },
+      {
+        "key": "e3_0",
+        "evidenceIds": [
+          "e3"
+        ],
+        "group": "e3",
+        "from": 100.22,
+        "to": 106.04,
+        "anchor": 104.61000000000001,
+        "detail": "low",
+        "detailReason": "自制卡片核验说明 291"
+      },
+      {
+        "key": "e4_0",
+        "evidenceIds": [
+          "e4"
+        ],
+        "group": "e4",
+        "from": 333.38,
+        "to": 339.83,
+        "anchor": 337.5,
+        "detail": "low",
+        "detailReason": "自制卡片核验说明 291"
+      },
+      {
+        "key": "e4_1",
+        "evidenceIds": [
+          "e4"
+        ],
+        "group": "e4",
+        "from": 339.83,
+        "to": 346.96,
+        "anchor": 343.13,
+        "detail": "low",
+        "detailReason": "自制卡片核验说明 291"
+      }
+    ],
+    "frames": [
+      {
+        "slotKey": "e1_0",
+        "attachmentId": "00000000-0000-4000-8000-000000000001",
+        "time": 66.239999,
+        "detail": "low"
+      },
+      {
+        "slotKey": "e2_0",
+        "attachmentId": "00000000-0000-4000-8000-000000000002",
+        "time": 88.639,
+        "detail": "original"
+      },
+      {
+        "slotKey": "e3_0",
+        "attachmentId": "00000000-0000-4000-8000-000000000003",
+        "time": 103.11,
+        "detail": "low"
+      },
+      {
+        "slotKey": "e4_0",
+        "attachmentId": "00000000-0000-4000-8000-000000000004",
+        "time": 337.5,
+        "detail": "low"
+      },
+      {
+        "slotKey": "e4_1",
+        "attachmentId": "00000000-0000-4000-8000-000000000005",
+        "time": 343.13,
+        "detail": "low"
+      }
+    ],
+    "candidates": [
+      {
+        "slotKey": "e1_0",
+        "time": 67.74,
+        "width": 768,
+        "height": 432,
+        "bytes": 168863,
+        "quality": 0.6031783994843208,
+        "metrics": {
+          "sharpness": 27.88477320616613,
+          "contrast": 105.14386260158494
+        },
+        "decision": "alternative"
+      },
+      {
+        "slotKey": "e1_0",
+        "time": 69.24,
+        "width": 768,
+        "height": 432,
+        "bytes": 153000,
+        "quality": 0.4681617982668988,
+        "metrics": {
+          "sharpness": 17.452700454696686,
+          "contrast": 43.749527268723625
+        },
+        "decision": "alternative"
+      },
+      {
+        "slotKey": "e1_0",
+        "time": 66.239999,
+        "width": 768,
+        "height": 432,
+        "bytes": 157729,
+        "quality": 0.6091731011311716,
+        "metrics": {
+          "sharpness": 28.78313186203837,
+          "contrast": 104.75756878212489
+        },
+        "decision": "selected"
+      },
+      {
+        "slotKey": "e2_0",
+        "time": 90.139,
+        "width": 853,
+        "height": 480,
+        "bytes": 150735,
+        "quality": 0.49629955341385884,
+        "metrics": {
+          "sharpness": 18.52614505933237,
+          "contrast": 60.599668711197396
+        },
+        "decision": "alternative"
+      },
+      {
+        "slotKey": "e2_0",
+        "time": 91.639,
+        "width": 853,
+        "height": 480,
+        "bytes": 155097,
+        "quality": 0.4828836852243203,
+        "metrics": {
+          "sharpness": 17.39336808251081,
+          "contrast": 59.58357257926126
+        },
+        "decision": "alternative"
+      },
+      {
+        "slotKey": "e2_0",
+        "time": 88.639,
+        "width": 853,
+        "height": 480,
+        "bytes": 162716,
+        "quality": 0.5216864195118079,
+        "metrics": {
+          "sharpness": 20.795857824110016,
+          "contrast": 63.47637636169891
+        },
+        "decision": "selected"
+      },
+      {
+        "slotKey": "e3_0",
+        "time": 104.61,
+        "width": 768,
+        "height": 432,
+        "bytes": 93243,
+        "quality": 0.4491493059781911,
+        "metrics": {
+          "sharpness": 14.28271598092492,
+          "contrast": 66.09119758656993
+        },
+        "decision": "alternative"
+      },
+      {
+        "slotKey": "e3_0",
+        "time": 106.04,
+        "width": 768,
+        "height": 432,
+        "bytes": 78534,
+        "quality": 0.3988569299481709,
+        "metrics": {
+          "sharpness": 10.999944549184873,
+          "contrast": 64.92375356621932
+        },
+        "decision": "alternative"
+      },
+      {
+        "slotKey": "e3_0",
+        "time": 103.11,
+        "width": 768,
+        "height": 432,
+        "bytes": 155343,
+        "quality": 0.6353527382265476,
+        "metrics": {
+          "sharpness": 32.925779083952534,
+          "contrast": 106.00135015825582
+        },
+        "decision": "selected"
+      },
+      {
+        "slotKey": "e4_0",
+        "time": 337.5,
+        "width": 768,
+        "height": 432,
+        "bytes": 98108,
+        "quality": 0.5181463040660532,
+        "metrics": {
+          "sharpness": 19.964428302096042,
+          "contrast": 69.79478974884928
+        },
+        "decision": "selected"
+      },
+      {
+        "slotKey": "e4_0",
+        "time": 339,
+        "width": 768,
+        "height": 432,
+        "bytes": 91566,
+        "quality": 0.5147017877833892,
+        "metrics": {
+          "sharpness": 19.629810358212264,
+          "contrast": 69.70225241581142
+        },
+        "decision": "alternative"
+      },
+      {
+        "slotKey": "e4_1",
+        "time": 343.13,
+        "width": 768,
+        "height": 432,
+        "bytes": 99429,
+        "quality": 0.497350804792763,
+        "metrics": {
+          "sharpness": 17.971692358877675,
+          "contrast": 70.10635399003147
+        },
+        "decision": "selected"
+      }
+    ],
+    "unresolved": [
+      "自制卡片核验说明 288",
+      "自制卡片核验说明 289",
+      "自制卡片核验说明 290",
+      "自制卡片核验说明 293"
+    ],
+    "budget": {
+      "imageTokensUpperBound": 5120,
+      "apiTokensUpperBound": 64495,
+      "imageBytes": 673325,
+      "captures": 12,
+      "mediaMs": 801,
+      "maxCaptures": 18,
+      "maxMediaMs": 45000,
+      "tokenCeiling": 262144,
+      "finalOutputReserved": 4096
+    },
+    "stopReason": "budget"
+  },
+  "images": [
+    {
+      "time": 66.239999,
+      "width": 768,
+      "height": 432,
+      "bytes": 157729,
+      "sha256": "0db2f40cfcb20bfffade7c4cd3fbe994b5cb47f6bcd5155d2362dd67f4cfa5cb",
+      "id": "00000000-0000-4000-8000-000000000001",
+      "workspaceId": "manual-real-video",
+      "chatId": "manual",
+      "mimeType": "image/png",
+      "createdAt": 1792615733637,
+      "source": {
+        "platform": "bilibili",
+        "videoId": "BVsyntheticAudit",
+        "partId": "1"
+      }
+    },
+    {
+      "time": 88.639,
+      "width": 853,
+      "height": 480,
+      "bytes": 162716,
+      "sha256": "deb29770ff5e8a7f11e99e2cc43cb0529b4423860027bb2f53b3b9c0e773bbde",
+      "id": "00000000-0000-4000-8000-000000000002",
+      "workspaceId": "manual-real-video",
+      "chatId": "manual",
+      "mimeType": "image/png",
+      "createdAt": 1792615733813,
+      "source": {
+        "platform": "bilibili",
+        "videoId": "BVsyntheticAudit",
+        "partId": "1"
+      }
+    },
+    {
+      "time": 103.11,
+      "width": 768,
+      "height": 432,
+      "bytes": 155343,
+      "sha256": "a3e0d5b75ab76aa0d243c0270fde017a64da2d9edf999e9cbfca6aa20ed878e5",
+      "id": "00000000-0000-4000-8000-000000000003",
+      "workspaceId": "manual-real-video",
+      "chatId": "manual",
+      "mimeType": "image/png",
+      "createdAt": 1792615733987,
+      "source": {
+        "platform": "bilibili",
+        "videoId": "BVsyntheticAudit",
+        "partId": "1"
+      }
+    },
+    {
+      "time": 337.5,
+      "width": 768,
+      "height": 432,
+      "bytes": 98108,
+      "sha256": "ab9b36ff63966401513389abbfde08bf709bef691c5a67cd48da9645025f6e63",
+      "id": "00000000-0000-4000-8000-000000000004",
+      "workspaceId": "manual-real-video",
+      "chatId": "manual",
+      "mimeType": "image/png",
+      "createdAt": 1792615734169,
+      "source": {
+        "platform": "bilibili",
+        "videoId": "BVsyntheticAudit",
+        "partId": "1"
+      }
+    },
+    {
+      "time": 343.13,
+      "width": 768,
+      "height": 432,
+      "bytes": 99429,
+      "sha256": "91ca03581451d800611f8fce010f5eafe2699ddfdcc1074bde8ae981f5ec66eb",
+      "id": "00000000-0000-4000-8000-000000000005",
+      "workspaceId": "manual-real-video",
+      "chatId": "manual",
+      "mimeType": "image/png",
+      "createdAt": 1792615734199,
+      "source": {
+        "platform": "bilibili",
+        "videoId": "BVsyntheticAudit",
+        "partId": "1"
+      }
+    }
+  ],
+  "scope": "public 480p stream in an independent local browser; canvas adapter + production selection/PNG validation; not installed-extension capture"
+}

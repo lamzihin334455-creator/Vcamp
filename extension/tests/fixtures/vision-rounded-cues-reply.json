@@ -1,0 +1,138 @@
+{
+  "version": 2,
+  "scope": "focused",
+  "needsNewFrames": true,
+  "evidence": [
+    {
+      "id": "e1",
+      "need": "核对自制几何卡片 304 的外框、网格与选中标记",
+      "priority": "required",
+      "mode": "sequence",
+      "reuseAttachmentIds": [],
+      "windows": [
+        {
+          "from": 64,
+          "to": 72,
+          "anchor": 68,
+          "cueIds": [
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "basis": "subtitle"
+        }
+      ],
+      "detailNeed": "overview",
+      "readTargets": [],
+      "reason": "按合成字幕定位自制卡片 305，仅核对已提供的图像"
+    },
+    {
+      "id": "e2",
+      "need": "核对自制几何卡片 306 的外框、网格与选中标记",
+      "priority": "required",
+      "mode": "sequence",
+      "reuseAttachmentIds": [],
+      "windows": [
+        {
+          "from": 84,
+          "to": 93,
+          "anchor": 89,
+          "cueIds": [
+            37,
+            38,
+            39,
+            40
+          ],
+          "basis": "subtitle"
+        }
+      ],
+      "detailNeed": "overview",
+      "readTargets": [],
+      "reason": "按合成字幕定位自制卡片 307，仅核对已提供的图像"
+    },
+    {
+      "id": "e3",
+      "need": "核对自制几何卡片 308 的外框、网格与选中标记",
+      "priority": "required",
+      "mode": "single",
+      "reuseAttachmentIds": [],
+      "windows": [
+        {
+          "from": 103,
+          "to": 106,
+          "anchor": 104.6,
+          "cueIds": [
+            44,
+            45
+          ],
+          "basis": "subtitle"
+        }
+      ],
+      "detailNeed": "overview",
+      "readTargets": [],
+      "reason": "按合成字幕定位自制卡片 309，仅核对已提供的图像"
+    },
+    {
+      "id": "e4",
+      "need": "核对自制几何卡片 310 的外框、网格与选中标记",
+      "priority": "optional",
+      "mode": "single",
+      "reuseAttachmentIds": [],
+      "windows": [
+        {
+          "from": 163,
+          "to": 184,
+          "anchor": 170,
+          "cueIds": [
+            68,
+            69,
+            70,
+            73,
+            77,
+            80
+          ],
+          "basis": "subtitle"
+        }
+      ],
+      "detailNeed": "read-text",
+      "readTargets": [
+        "自制卡片细节 311"
+      ],
+      "reason": "按合成字幕定位自制卡片 312，仅核对已提供的图像"
+    },
+    {
+      "id": "e5",
+      "need": "核对自制几何卡片 313 的外框、网格与选中标记",
+      "priority": "optional",
+      "mode": "single",
+      "reuseAttachmentIds": [],
+      "windows": [
+        {
+          "from": 503,
+          "to": 512,
+          "anchor": 506,
+          "cueIds": [
+            234,
+            235,
+            236,
+            237,
+            238
+          ],
+          "basis": "subtitle"
+        }
+      ],
+      "detailNeed": "read-text",
+      "readTargets": [
+        "自制卡片细节 314",
+        "自制卡片细节 315"
+      ],
+      "reason": "按合成字幕定位自制卡片 316，仅核对已提供的图像"
+    }
+  ],
+  "unresolved": [
+    "自制卡片核验说明 317"
+  ]
+}

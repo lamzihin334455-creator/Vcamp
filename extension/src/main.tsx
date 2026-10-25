@@ -1,0 +1,13 @@
+import { HtmlPages } from './workbench/HtmlPages';
+import { LibraryWorkbench } from './library/Library';
+import { LibraryReader } from './library/Reader';
+import { SubtitleWorkbench } from './workbench/Subtitles';
+import { ScribbleWorkbench } from './workbench/Scribbles';
+import { createRoot } from 'react-dom/client';
+import { App } from './app/App';
+import { createChromeClient } from './app/chrome-client';
+import { MarkdownWorkbench } from './workbench/Markdown';
+import {Startup,StartupBoundary} from './brand/Startup';
+const readonly = location.pathname === '/reader.html';
+const client = createChromeClient(readonly);
+createRoot(document.getElementById('root')!).render(<>{readonly && new URLSearchParams(location.search).get('library') === '1' ? <LibraryReader client={client}/> : <App readonly={readonly} client={client} registrations={[{ id: 'html', title: 'HTML', empty: '暂无页面', View: HtmlPages },{ id: 'library', title: '资料库', empty: '暂无资料', View: LibraryWorkbench }, { id: 'subtitle', title: '字幕', empty: '暂无字幕', View: SubtitleWorkbench }, { id: 'markdown', title: '笔记', empty: '暂无笔记', View: MarkdownWorkbench }, { id: 'scribble', title: '随笔', empty: '暂无随笔', View: ScribbleWorkbench }]}/>}{location.pathname==='/sidepanel.html'&&<StartupBoundary><Startup/></StartupBoundary>}</>);

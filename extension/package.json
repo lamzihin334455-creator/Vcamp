@@ -1,0 +1,40 @@
+{
+  "name": "vcamp-extension",
+  "private": true,
+  "version": "0.1.82",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "build:test": "vite build --mode test-extension",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build:capture-test": "vite build --mode capture-test",
+    "test:e2e": "node scripts/test-e2e.mjs"
+  },
+  "dependencies": {
+    "@remotion/paths": "4.0.534",
+    "@remotion/player": "4.0.534",
+    "fflate": "0.8.3",
+    "lucide-react": "^1.59.0",
+    "pinyin-match": "1.2.10",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-markdown": "10.1.0",
+    "remark-gfm": "4.0.1",
+    "remotion": "4.0.534",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1",
+    "@types/chrome": "0.1.24",
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "@vitejs/plugin-react": "5.0.4",
+    "fake-indexeddb": "6.2.4",
+    "typescript": "5.9.3",
+    "vite": "6.4.5",
+    "vitest": "4.1.12"
+  }
+}

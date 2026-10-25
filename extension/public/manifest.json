@@ -1,0 +1,59 @@
+{
+  "manifest_version": 3,
+  "name": "Vcamp",
+  "version": "0.1.82",
+  "minimum_chrome_version": "116",
+  "description": "围绕视频学习的本地工作台",
+  "permissions": [
+    "sidePanel",
+    "scripting",
+    "webNavigation",
+    "storage",
+    "tabs",
+    "downloads"
+  ],
+  "host_permissions": [
+    "https://api.deepseek.com/*",
+    "https://dashscope.aliyuncs.com/*",
+    "https://api.siliconflow.cn/*",
+    "https://open.bigmodel.cn/*",
+    "https://token.sensenova.cn/*",
+    "https://api.sensenova.cn/*",
+    "https://www.bilibili.com/*",
+    "https://api.bilibili.com/*",
+    "https://aisubtitle.hdslb.com/*"
+  ],
+  "action": {
+    "default_title": "打开 Vcamp",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "background": {
+    "service_worker": "assets/background.js",
+    "type": "module"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'; frame-src 'self'",
+    "sandbox": "sandbox allow-scripts; default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; frame-src about:; connect-src 'none'; img-src data:; object-src 'none'; base-uri 'none'; form-action 'none'"
+  },
+  "sandbox": {
+    "pages": [
+      "sandbox.html"
+    ]
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "optional_host_permissions": [
+    "https://*/*"
+  ]
+}

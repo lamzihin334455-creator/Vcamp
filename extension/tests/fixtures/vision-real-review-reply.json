@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "results": [
+    {
+      "evidenceId": "e1",
+      "status": "sufficient",
+      "imageRefs": [
+        "i0"
+      ],
+      "observations": [
+        "画面可见自制卡片 294 的外框及顶部标记",
+        "画面可见自制卡片 295 的外框及顶部标记"
+      ],
+      "missing": "",
+      "refinements": []
+    },
+    {
+      "evidenceId": "e2",
+      "status": "sufficient",
+      "imageRefs": [
+        "i1"
+      ],
+      "observations": [
+        "画面可见自制卡片 296 的外框及顶部标记",
+        "画面可见自制卡片 297 的外框及顶部标记"
+      ],
+      "missing": "自制卡片 298 的小标记尚未辨清",
+      "refinements": []
+    },
+    {
+      "evidenceId": "e3",
+      "status": "sufficient",
+      "imageRefs": [
+        "i2"
+      ],
+      "observations": [
+        "画面可见自制卡片 299 的外框及顶部标记",
+        "画面可见自制卡片 300 的外框及顶部标记"
+      ],
+      "missing": "",
+      "refinements": []
+    },
+    {
+      "evidenceId": "e4",
+      "status": "partial",
+      "imageRefs": [
+        "i3",
+        "i4"
+      ],
+      "observations": [
+        "画面可见自制卡片 301 的外框及顶部标记",
+        "画面可见自制卡片 302 的外框及顶部标记"
+      ],
+      "missing": "自制卡片 303 的小标记尚未辨清",
+      "refinements": [
+        {
+          "slotKey": "e4_1",
+          "window": {
+            "from": 339.83,
+            "to": 346.96,
+            "anchor": 343.13,
+            "cueIds": [
+              156,
+              157,
+              158
+            ],
+            "basis": "subtitle"
+          }
+        }
+      ]
+    }
+  ]
+}

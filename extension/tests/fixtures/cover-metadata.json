@@ -1,0 +1,6 @@
+{
+  "videoId": "BVcoverFixture",
+  "title": "封面与权限回归夹具",
+  "coverUrl": "https://i0.hdslb.com/bfs/archive/vcamp-fixture.png",
+  "pages": [{"page":1,"cid":101,"part":"第一部分"},{"page":2,"cid":102,"part":"第二部分"}]
+}
