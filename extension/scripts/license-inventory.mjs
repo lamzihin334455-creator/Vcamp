@@ -1,6 +1,10 @@
 import {readFile,writeFile,mkdir,readdir,rm} from 'node:fs/promises';
 import {resolve,dirname} from 'node:path';
 const lock=JSON.parse(await readFile('package-lock.json','utf8'));
+async function writeGenerated(path,text){
+  try{if(await readFile(path,'utf8')===text)return;}catch(error){if(error.code!=='ENOENT')throw error;}
+  await writeFile(path,text);
+}
 const rows=[];
 for(const [path,info] of Object.entries(lock.packages)){
   if(!path||info.dev||info.optional)continue;
@@ -11,7 +15,7 @@ for(const [path,info] of Object.entries(lock.packages)){
   await mkdir(resolve('..',destination),{recursive:true});
   // Match the repository's LF policy so regeneration stays clean after a fresh
   // Windows checkout, including packages that publish license text with CRLF.
-  for(const file of licenses)await writeFile(resolve('..',destination,file),(await readFile(resolve(path,file),'utf8')).replaceAll('\r\n','\n'));
+  for(const file of licenses)await writeGenerated(resolve('..',destination,file),(await readFile(resolve(path,file),'utf8')).replaceAll('\r\n','\n'));
   rows.push({name,version:info.version,license:pkg.license??info.license??'UNKNOWN',path:destination});
 }
 rows.sort((a,b)=>a.name.localeCompare(b.name));
@@ -25,5 +29,5 @@ for(const entry of await readdir(licenseRoot,{withFileTypes:true})){
   if(entry.isDirectory()&&!entry.isSymbolicLink()&&!retained.has(target))await rm(target,{recursive:true});
 }
 const text='# Third-party notices\n\nGenerated from the production lockfile and installed package license texts. Project-owned code uses MIT; these dependencies retain their original licenses. Development tools and the separate video project have their own licenses.\n\n| Package | Version | License | Text |\n| --- | --- | --- | --- |\n'+rows.map(r=>`| ${r.name} | ${r.version} | ${r.license} | [license](${r.path}/) |`).join('\n')+'\n';
-await writeFile('../THIRD_PARTY_NOTICES.md',text);
+await writeGenerated('../THIRD_PARTY_NOTICES.md',text);
 console.log(JSON.stringify({productionPackages:rows.length,licenses:[...new Set(rows.map(r=>r.license))]}));
