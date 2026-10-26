@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import { VideoSessions, type SiteAdapter } from '../../src/video/sessions';
 import { sendConditions } from '../../src/contracts/video';
 
@@ -85,6 +85,9 @@ test('B: late full subtitles after a rapid part change never enter the new space
 });
 
 test('B: a burst of invalidations coalesces obsolete observations instead of building a page-script backlog', async () => {
+  // Measure queued observation delay, independently of hosted-runner CPU pauses.
+  vi.useFakeTimers({toFake:['Date','setTimeout','clearTimeout']});
+  try{
   let part='1',calls=0;
   const sessions=new VideoSessions({
     observe:async()=>{const captured=part;calls++;await new Promise(r=>setTimeout(r,6));return {documentId:'doc',marker:captured,source:{platform:'bilibili' as const,videoId:'BVburst',partId:captured,title:`P${captured}`}};},
@@ -93,11 +96,14 @@ test('B: a burst of invalidations coalesces obsolete observations instead of bui
   });
   const started=Date.now(),pending:Promise<unknown>[]=[];
   for(let i=1;i<=40;i++){part=String(i);sessions.invalidate(1);pending.push(sessions.observe(1));}
+  await vi.runAllTimersAsync();
   await Promise.all(pending);
-  const latest=await sessions.observe(1),elapsed=Date.now()-started;
+  const latestPending=sessions.observe(1);await vi.runAllTimersAsync();
+  const latest=await latestPending,elapsed=Date.now()-started;
   expect(latest.binding?.partId).toBe('40');
   expect(calls).toBeLessThanOrEqual(4);
   expect(elapsed).toBeLessThan(100);
+  }finally{vi.useRealTimers();}
 });
 
 test('B: a transient subtitle read failure recovers without a page refresh or manual retry', async () => {
