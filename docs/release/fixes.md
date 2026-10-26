@@ -1,6 +1,6 @@
 # 审查修复台账
 
-基线为 pre-v1.0-baseline。Standards 和 Spec 原始严重度分别保留，不将两条审查轴重新混排。当前未确认 P0/P1；这不是对所有未审路径的无缺陷保证。
+基线为 pre-v1.0-baseline。Standards 和 Spec 原始严重度分别保留，不将两条审查轴重新混排。基线审查未确认 P0/P1；最终 CI 排查又发现并修正下列交互竞态。完整发布门禁结果以 Release 验收附件为准，这不是对所有未审路径的无缺陷保证。
 
 | ID | 原级别 | 处理 | 回归证据 |
 | --- | --- | --- | --- |
@@ -12,6 +12,9 @@
 | SPEC-03 | P2 | 导出契约与 4M 保存上限及二进制上限分别对齐 | 2.1M Markdown/HTML 完整导出，契约验证通过 |
 | DEP-01 | dependency gate | Zod 升至 4.6.7，移除扩展全部 Remotion 依赖 | 官方 npm audit 0 vulnerabilities；单测与浏览器回归 |
 | COMPAT-01 | compatibility | Zod 联合类型内的容量错误保留精确安全字段路径 | vision-cue-proposal 回归 |
+| FINAL-01 | P1 | 关闭联网后立即重试可能先于偏好保存而再次搜索；界面重试现先等待草稿队列保存，再执行后台权限检查 | web-permission-timeline：注入 750ms 保存延迟，关闭时 UI 重试和直接调用均拒绝、搜索次数不变，重新开启后 UI 重试完成 |
+| FINAL-02 | P2 | 主字幕快照未返回时控件已可选，但选择会被忽略；现读取就绪前禁用主字幕选择 | subtitle-html-fix：普通和延迟 750ms 两种快照下，选择、持久化、多语导出、HTML 定位均验证 |
+| FINAL-03 | P2 | 后台状态读取成功会立即清除操作拒绝提示；现保留操作错误至下一次操作或切换目标，连接读取错误仍可自动恢复 | web-permission-timeline：关闭联网的拒绝提示持续可见，重新开启并通过 UI 重试后清除 |
 
 ## 陈旧测试调整
 

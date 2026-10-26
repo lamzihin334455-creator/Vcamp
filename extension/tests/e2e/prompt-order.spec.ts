@@ -1,16 +1,44 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { setup } from './interaction-fixture';
 
-test('compact workflow: top create, click edit, hold reorder, Escape cancel, keyboard and reload', async () => {
+async function delayCatalog(page: Page, delay: number) {
+  if (!delay) return;
+  const install = (delay: number) => {
+    const send = chrome.runtime.sendMessage.bind(chrome.runtime);
+    chrome.runtime.sendMessage = (async (message: any) => {
+      const result = await send(message);
+      if (['template.query', 'style.query'].includes(message.operation?.type)) await new Promise(resolve => setTimeout(resolve, delay));
+      return result;
+    }) as typeof chrome.runtime.sendMessage;
+  };
+  await page.addInitScript(install, delay);
+  await page.evaluate(install, delay);
+}
+
+async function loadedCatalog(page: Page, kind: 'template' | 'style') {
+  const ids = await page.evaluate(async kind => {
+    const result = await chrome.runtime.sendMessage({version: 1, requestId: crypto.randomUUID(), operation: {type: `${kind}.query`}});
+    if (!result.ok) throw Error('Catalog query failed');
+    const entries = kind === 'template' ? result.view.templates.templates : result.view.styles.styles;
+    return entries.filter((entry: {deleted?: boolean}) => !entry.deleted).map((entry: {id: string}) => entry.id);
+  }, kind);
+  expect(ids.length).toBeGreaterThan(2);
+  await expect.poll(() => page.locator('.prompt-sortable-list [data-prompt-id]').evaluateAll(rows => rows.map(row => row.getAttribute('data-prompt-id')))).toEqual(ids);
+  return ids;
+}
+
+for (const catalogDelay of [0, 750]) {
+test(`compact workflow: top create, click edit, hold reorder, Escape cancel, keyboard and reload (catalog delay ${catalogDelay}ms)`, async () => {
   const { context, page, site, forbidden } = await setup();
   try {
+    await delayCatalog(page, catalogDelay);
     const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
     for (const name of ['坐标传送门', '健康度检测']) await page.evaluate(name => chrome.runtime.sendMessage({ version: 1, requestId: crypto.randomUUID(), operation: { type: 'template.create', fields: { name, description: '', requirements: '回答', outputType: 'chat', defaultModelId: null } } }), name);
     await page.getByRole('button', { name: '设置', exact: true }).click();
     await page.getByRole('button', { name: '模板工作流', exact: true }).click();
     const rows = page.locator('.prompt-sortable-list [data-prompt-id]');
     await expect(rows.first()).toBeVisible();
-    const initial = await rows.evaluateAll(rows => rows.map(row => row.getAttribute('data-prompt-id')!));
+    const initial = await loadedCatalog(page, 'template');
     for (const width of [280, 360, 500]) {
       await page.setViewportSize({ width, height: 850 });
       await expect(page.getByRole('button', { name: '新建模板', exact: true })).toBeVisible();
@@ -48,7 +76,7 @@ test('compact workflow: top create, click edit, hold reorder, Escape cancel, key
     await page.getByRole('button', { name: '返回模板列表', exact: true }).click();
     await page.getByRole('button', { name: '风格管理', exact: true }).click();
     await expect(page.getByRole('button', { name: '新建风格', exact: true })).toBeVisible();
-    const styleBefore = await rows.evaluateAll(rows => rows.map(row => row.getAttribute('data-prompt-id')!));
+    const styleBefore = await loadedCatalog(page, 'style');
     const style = (await rows.first().boundingBox())!, destination = (await rows.nth(2).boundingBox())!;
     const cdp = await context.newCDPSession(page);
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: style.x + 50, y: style.y + 24 }] });
@@ -64,14 +92,15 @@ test('compact workflow: top create, click edit, hold reorder, Escape cancel, key
   } finally { await context.close(); }
 });
 
-test('touch scroll is preserved before a hold; dragging a long list scrolls its edge and saves the drop', async () => {
+test(`touch scroll is preserved before a hold; dragging a long list scrolls its edge and saves the drop (catalog delay ${catalogDelay}ms)`, async () => {
   const { context, page } = await setup();
   try {
+    await delayCatalog(page, catalogDelay);
     for (let index = 0; index < 18; index++) await page.evaluate(index => chrome.runtime.sendMessage({ version: 1, requestId: crypto.randomUUID(), operation: { type: 'template.create', fields: { name: `长列表任务 ${index}`, description: '', requirements: '回答', outputType: 'chat', defaultModelId: null } } }), index);
     await page.setViewportSize({ width: 360, height: 500 });
     await page.getByRole('button', { name: '设置', exact: true }).click(); await page.getByRole('button', { name: '模板工作流', exact: true }).click();
     const scroller = page.locator('.settings-page'), rows = page.locator('[data-prompt-id]');
-    const before = await rows.evaluateAll(rows => rows.map(row => row.getAttribute('data-prompt-id')));
+    const before = await loadedCatalog(page, 'template');
     const first = (await rows.first().boundingBox())!, cdp = await context.newCDPSession(page);
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: first.x + 80, y: 420 }] });
     for (const y of [380, 340, 300, 260]) await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: first.x + 80, y }] });
@@ -94,3 +123,4 @@ test('touch scroll is preserved before a hold; dragging a long list scrolls its 
     await expect(page.locator('.prompt-editor')).toHaveCount(0);
   } finally { await context.close(); }
 });
+}

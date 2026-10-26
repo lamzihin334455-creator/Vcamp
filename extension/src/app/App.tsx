@@ -113,7 +113,7 @@ export function App({ client, readonly, registrations = [] }: { client: Applicat
   const [artifactId, setArtifactId] = useState<string | undefined>(() => readonly ? new URLSearchParams(location.search).get('artifactId') ?? undefined : undefined);
   const [scribbleId, setScribbleId] = useState<string | undefined>(() => readonly ? new URLSearchParams(location.search).get('scribbleId') ?? undefined : undefined);
   const [scribbleError, setScribbleError] = useState('');
-  const generation = useGeneration(client, !(readonly && (artifactId || scribbleId || knowledgeId)) && workspace.view?.workspaceId && workspace.view.chatId ? { kind: 'chat', workspaceId: workspace.view.workspaceId, chatId: workspace.view.chatId } : null);
+  const generation = useGeneration(client, !(readonly && (artifactId || scribbleId || knowledgeId)) && workspace.view?.workspaceId && workspace.view.chatId ? { kind: 'chat', workspaceId: workspace.view.workspaceId, chatId: workspace.view.chatId } : null, workspace.flush);
   const [pendingSend,setPendingSend]=useState<{text:string;messageIds:string[]}|null>(null);
   const sending=useRef(false);
   const pendingVisible=!!pendingSend&&!generation.view?.messages.some(message=>message.role==='user'&&!pendingSend.messageIds.includes(message.messageId));

@@ -93,7 +93,7 @@ for (const withTemplate of [false, true]) test(`actual send action template=${wi
       const workspace = (await command({type: 'workspace.query'})).view;
       await page.getByRole('button', {name: '发送', exact: true}).click();
       const query = async () => (await command({type: 'generation.query', target: {kind: 'chat', workspaceId: workspace.workspaceId, chatId: workspace.chatId}})).view.generation.jobs.at(-1);
-      await expect.poll(async () => (await query())?.state).toBe('completed');
+      await expect.poll(async () => (await query())?.state, {timeout: 20000}).toBe('completed');
       const result = await query();
       expect(result.diagnostics.at(-1)).toMatchObject({purpose: 'html-page', cause: 'stop', maxTokens: 393216, htmlEnvelope: 'complete', usage: {outputTokens: 9000}});
       states.push({withTemplate, state: result.state, diagnostic: result.diagnostics.at(-1)});

@@ -13,6 +13,8 @@ for(const mode of ['sufficient','partial-checks','limited-checks','interval','mi
         if(!String(input).startsWith('https://api.deepseek.com/'))return original(input,init);
         if(!init?.method||init.method==='GET')return new Response(JSON.stringify({object:'list',data:[{id:'local-vision',name:'Local vision',input_modalities:['text','image']}]}),{headers:{'content-type':'application/json'}});
         const body=JSON.parse(init.body),system=String(body.messages[0].content),kind=system.includes('[P1:requirements-plan]')?'requirements':system.includes('[P1:vision-plan]')?'vision':system.includes('[P1:vision-review]')?'review':'answer';
+        // A checking snapshot can precede the asynchronous review transport log.
+        if(kind==='review'&&mode==='sufficient')await new Promise(resolve=>setTimeout(resolve,750));
         const leaseKeys=Object.keys(await chrome.storage.session.get(null)).filter(k=>k.startsWith('vcamp.currentMedia.')||k.startsWith('vcamp.visionGrant.'));
         (globalThis as any).phase2Requests.push({kind,body,leaseKeys});
         let content='本地模拟回答：请用真实模型与视频另行验证读字效果。';
@@ -71,6 +73,7 @@ for(const mode of ['sufficient','partial-checks','limited-checks','interval','mi
       expect(before.visual.audit.slots.map((s:any)=>s.anchor)).toEqual([1.8,2.8]);
       expect(before.visual.audit.frames[0].time).toBeLessThan(before.visual.audit.frames[1].time);
     }
+    await expect.poll(()=>worker.evaluate(()=>(globalThis as any).phase2Requests.some((r:any)=>r.kind==='review'))).toBe(true);
     const reviewCall=await worker.evaluate(()=>(globalThis as any).phase2Requests.find((r:any)=>r.kind==='review'));
     expect(reviewCall.leaseKeys).toEqual([]);expect(reviewCall.body.max_tokens).toBe(16384);
     const reviewImages=reviewCall.body.messages[1].content.filter((p:any)=>p.type==='image_url');expect(reviewImages).toHaveLength(expectedImages);expect(reviewImages[0].image_url.detail).toBe('original');

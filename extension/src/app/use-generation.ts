@@ -50,31 +50,35 @@ const errorText: Record<string, string> = {
 };
 export const taskLabels: Record<JobView['state'], string> = { queued: '排队中', preparing: '准备中', 'awaiting-permission': '等待权限', running: '生成中', committing: '正在保存', completed: '已完成', stopped: '已停止', failed: '生成失败', interrupted: '任务已中断' };
 export const failureLabels: Record<NonNullable<JobView['error']>, string> = { 'web-disabled':'当前对话已关闭联网', 'web-unsupported':'联网检索模型不可用', 'web-tool':'搜索工具未完整执行', 'web-no-sources':'无可用网页来源', 'web-protocol':'检索／来源格式错误', 'html-format':'HTML 页面不完整，请调整需求后重新发送', 'knowledge-format':'交互知识格式无效或不完整，未保存；可修改要求或手动重试', 'legacy-knowledge':'旧 HTML 请求请新建', network: '网络或服务失败', auth: '认证失败', 'request-rejected': '服务拒绝请求', 'rate-limit': '服务限流', 'context-limit': '服务拒绝当前输入长度', protocol: '响应协议不完整', timeout: '请求超时', 'output-limit': '输出达到本轮上限，未标完成', 'executor-lost': '后台执行已中断，请手动重试', 'source-changed': '原字幕已变化', storage: '持久保存失败', 'model-unavailable': '原模型或密钥不可用' };
-export function useGeneration(client: ApplicationClient, target: RequestTarget | null) {
+export function useGeneration(client: ApplicationClient, target: RequestTarget | null, beforeRetry?: () => Promise<boolean>) {
   const [view, setView] = useState<GenerationView | null>(null), [error, setError] = useState('');
+  const commandError = useRef(false);
   const [busy, setBusy] = useState(false);
   const key = JSON.stringify(target), epoch = useRef(0), current = useRef<GenerationView | null>(null);
   const accept = useCallback((value: GenerationView) => { current.current = reconcileGeneration(current.current, value); setView(current.current); }, []);
   useEffect(() => {
     const token = ++epoch.current;
     let sequence=0,applied=0;
-    current.current = null; setView(null); setError('');
+    current.current = null; setView(null); commandError.current = false; setError('');
     if (!target || !client.generation) return;
     async function refresh() {
       const read=++sequence;
-      try { const value = await client.generation!({ type: 'generation.query', target: target! }); if (epoch.current === token&&read>=applied) { applied=read;accept(value); setError(''); } }
-      catch (reason) { if (epoch.current === token&&read===sequence) { if (reason instanceof ApplicationError && reason.code === 'not-found') { current.current = null; setView(null); } setError('任务状态读取失败，正在重新核对。'); } }
+      try { const value = await client.generation!({ type: 'generation.query', target: target! }); if (epoch.current === token&&read>=applied) { applied=read;accept(value); if (!commandError.current) setError(''); } }
+      catch (reason) { if (epoch.current === token&&read===sequence) { if (reason instanceof ApplicationError && reason.code === 'not-found') { current.current = null; setView(null); } if (!commandError.current) setError('任务状态读取失败，正在重新核对。'); } }
     }
     // No pre-ack query. Registration/ack comes from the application client.
     const snapshots = createSnapshotRefresh(refresh,()=>!current.current||current.current.jobs.some(job=>!terminal(job.state)));
-    const dispose = client.subscribe(snapshots.request, state => { if (state !== 'connected' && epoch.current === token) setError('连接恢复中，正在核对后台任务状态。'); });
+    const dispose = client.subscribe(snapshots.request, state => { if (state !== 'connected' && epoch.current === token && !commandError.current) setError('连接恢复中，正在核对后台任务状态。'); });
     return () => { epoch.current++; snapshots.dispose();dispose(); };
   }, [client, key, accept]);
   async function command(op: GenerationCommand) {
     if (!client.generation || busy) return false;
-    const token = epoch.current; setBusy(true); setError('');
-    try { const value = await client.generation(op); if (epoch.current === token) accept(value); return true; }
-    catch (reason) { if (epoch.current === token) setError(reason instanceof ApplicationError ? errorText[reason.code] ?? '请求失败，请重试。' : '请求失败，请重试。'); return false; }
+    const token = epoch.current; setBusy(true); commandError.current = false; setError('');
+    try {
+      if (op.type === 'generation.retry' && beforeRetry && !await beforeRetry()) return false;
+      const value = await client.generation(op); if (epoch.current === token) accept(value); return true;
+    }
+    catch (reason) { if (epoch.current === token) { commandError.current = true; setError(reason instanceof ApplicationError ? errorText[reason.code] ?? '请求失败，请重试。' : '请求失败，请重试。'); } return false; }
     finally { setBusy(false); }
   }
   const visible=view&&JSON.stringify(view.target)===key?view:null;

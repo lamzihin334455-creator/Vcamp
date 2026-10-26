@@ -29,7 +29,7 @@ test('correction searches names, shares translation feedback, and changes the ma
   await page.reload();await expect(page.getByTestId('startup')).toHaveCount(0,{timeout:15000});await page.getByRole('navigation').getByRole('button',{name:'字幕',exact:true}).click();await page.getByRole('button',{name:'字幕设置',exact:true}).click();
   await expect(page.getByRole('checkbox',{name:'联网核对专有名词、人名和产品名称'})).toBeChecked();await page.getByRole('button',{name:'AI 字幕修正',exact:true}).click();
   const status=page.getByRole('region',{name:'AI 修正进度'});await expect(status).toBeVisible();await expect(page.getByRole('dialog',{name:'字幕设置'})).toHaveCount(0);
-  await expect.poll(()=>worker.evaluate(()=>(globalThis as any).qualityCalls)).toContain('process');await expect(status).toContainText('正在修正字幕');
+  await expect.poll(()=>worker.evaluate(()=>(globalThis as any).qualityCalls),{timeout:20000}).toContain('process');await expect(status).toContainText('正在修正字幕');
   const jobId=await status.getAttribute('data-translation-job-id');
   await worker.evaluate(()=>(globalThis as any).releaseQuality());await expect(status).toContainText('修正完成');await expect(status.getByRole('button',{name:'查看修正版',exact:true})).toBeVisible();
   expect((await command({type:'subtitles.query',workspaceId:fixture.workspaceId})).view.subtitles.analysisSource).toEqual(original);await expect(page.getByLabel('字幕时间轴')).toContainText('remousion');

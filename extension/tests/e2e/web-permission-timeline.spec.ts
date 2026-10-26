@@ -62,8 +62,20 @@ test('system default synchronizes current chat; independent overrides control ac
     const failed=await send('保留失败诊断','failed');
     expect(failed.error).toBe('web-protocol');
     expect(failed.diagnostics).toEqual(expect.arrayContaining([expect.objectContaining({purpose:'web-search',webStage:'envelope',webInvalidFields:expect.arrayContaining(['url'])})]));
+    await page.evaluate(()=>{
+      const send=chrome.runtime.sendMessage.bind(chrome.runtime);
+      chrome.runtime.sendMessage=(async(message:any)=>{
+        if(message.operation?.type==='draft.save'&&message.operation.draft.webEnabled===false)await new Promise(resolve=>setTimeout(resolve,750));
+        return send(message);
+      }) as typeof chrome.runtime.sendMessage;
+    });
     await top.click();await expect(top).toHaveAttribute('aria-pressed','false');
     const count=await searches();
+    await page.getByText('失败详情 / 重试',{exact:true}).last().click();
+    await page.getByRole('button',{name:'重试原请求',exact:true}).last().click();
+    await expect(page.locator('.error-banner').filter({hasText:'当前对话已关闭联网'})).toBeVisible();
+    expect(await searches()).toBe(count);
+    await expect.poll(async()=>(await saved()).draft.webEnabled).toBe(false);
     const retry=await command({type:'generation.retry',jobId:failed.jobId});
     expect(retry).toMatchObject({ok:false,code:'web-disabled'});expect(await searches()).toBe(count);
     // Model an existing 0.1.27 failed task in this isolated profile. Retrying
@@ -74,9 +86,10 @@ test('system default synchronizes current chat; independent overrides control ac
     }),failed.jobId);
     await worker.evaluate(()=>{(globalThis as any).badSearch=false;});
     await top.click();
-    expect((await command({type:'generation.retry',jobId:failed.jobId})).ok).toBe(true);
+    await page.getByRole('button',{name:'重试原请求',exact:true}).last().click();
     const retried=async()=>(await command({type:'generation.query',target:failed.target})).view.generation.jobs.find((j:any)=>j.jobId===failed.jobId);
     await expect.poll(async()=>(await retried())?.state).toBe('completed');
+    await expect(page.locator('.error-banner').filter({hasText:'当前对话已关闭联网'})).toHaveCount(0);
     expect((await retried()).attemptId).not.toBe(failed.attemptId);expect(await searches()).toBe(count+1);
     const inspection=(await command({type:'instructions.query',jobId:failed.jobId,workspaceId:failed.target.workspaceId,chatId:failed.target.chatId})).view.instructions;
     expect(inspection.calls.some((c:any)=>c.stage==='web-query')).toBe(true);

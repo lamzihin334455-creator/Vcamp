@@ -78,6 +78,7 @@ test('a source revision conflict retains the newer source instead of restoring a
   const {context,page,fixture}=await setup();
   try{
     await page.getByRole('navigation').getByRole('button',{name:'字幕',exact:true}).click();
+    await expect(page.getByRole('button',{name:'切换字幕轨道'})).toContainText(/AI (?:翻译|字幕修正)/);
     await page.evaluate(workspaceId=>{
       const original=chrome.runtime.sendMessage.bind(chrome.runtime);
       chrome.runtime.sendMessage=(async(message:any)=>{

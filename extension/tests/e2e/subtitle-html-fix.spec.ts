@@ -71,10 +71,18 @@ test('subtitle workbench uses one main subtitle and exposes independent AI actio
   }finally{await context.close();}
 });
 
-test('installed multilingual export, unified display choices and HTML native seek',async()=>{
+for(const snapshotDelay of [0,750])test(`installed multilingual export, unified display choices and HTML native seek (snapshot delay ${snapshotDelay}ms)`,async()=>{
   test.setTimeout(60000);
   const {context,page,site,forbidden,fixture}=await setup();
   try{
+    if(snapshotDelay)await page.evaluate(delay=>{
+      const send=chrome.runtime.sendMessage.bind(chrome.runtime);
+      chrome.runtime.sendMessage=(async(message:any)=>{
+        const result=await send(message);
+        if(message.operation?.type==='subtitles.query')await new Promise(resolve=>setTimeout(resolve,delay));
+        return result;
+      }) as typeof chrome.runtime.sendMessage;
+    },snapshotDelay);
     await page.getByRole('button',{name:'字幕',exact:true}).click();
     await expect(page.getByLabel('Chat 分析源')).toHaveCount(0);
     await expect(page.getByRole('button',{name:'AI 翻译',exact:true})).not.toBeVisible();
