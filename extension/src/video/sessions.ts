@@ -107,8 +107,11 @@ export class VideoSessions {
     if (!current.playback) throw new ApplicationError('read-failed');
     return current.playback;
   }
-  invalidate(tabId: number) {
+  invalidate(tabId: number, discardPending = false) {
     this.revisions.set(tabId,(this.revisions.get(tabId)??0)+1);
+    // Permission changes must not wait for a page script that lost access.
+    // The revision fence still rejects that detached run if it returns later.
+    if(discardPending)this.observations.delete(tabId);
     this.completed.delete(tabId);
     const entry = this.entries.get(tabId);
     if (!entry) return;

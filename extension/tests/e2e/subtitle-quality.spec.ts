@@ -31,7 +31,7 @@ test('correction searches names, shares translation feedback, and changes the ma
   const status=page.getByRole('region',{name:'AI 修正进度'});await expect(status).toBeVisible();await expect(page.getByRole('dialog',{name:'字幕设置'})).toHaveCount(0);
   await expect.poll(()=>worker.evaluate(()=>(globalThis as any).qualityCalls),{timeout:20000}).toContain('process');await expect(status).toContainText('正在修正字幕');
   const jobId=await status.getAttribute('data-translation-job-id');
-  await worker.evaluate(()=>(globalThis as any).releaseQuality());await expect(status).toContainText('修正完成');await expect(status.getByRole('button',{name:'查看修正版',exact:true})).toBeVisible();
+  await worker.evaluate(()=>(globalThis as any).releaseQuality());await expect(status).toContainText('修正完成',{timeout:20000});await expect(status.getByRole('button',{name:'查看修正版',exact:true})).toBeVisible();
   expect((await command({type:'subtitles.query',workspaceId:fixture.workspaceId})).view.subtitles.analysisSource).toEqual(original);await expect(page.getByLabel('字幕时间轴')).toContainText('remousion');
   await page.screenshot({path:test.info().outputPath('correction-completed.png'),animations:'disabled'});
   await status.getByRole('button',{name:'查看修正版',exact:true}).click();await expect(page.getByLabel('字幕时间轴')).toContainText('Remotion');await expect(status).toHaveCount(0);

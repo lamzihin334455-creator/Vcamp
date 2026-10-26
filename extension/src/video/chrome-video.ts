@@ -157,8 +157,15 @@ export function createChromeVideo(changed: () => void, recordPosition?: (source:
       stabilize(tab.id);
     }
   }
-  chrome.permissions.onAdded.addListener(() => { verifiedDecoders.clear();void chrome.tabs.query({}).then(tabs=>{for(const tab of tabs)if(tab.id!==undefined)sessions.invalidate(tab.id);void setup();changed();}); });
-  chrome.permissions.onRemoved.addListener(() => { verifiedDecoders.clear();void chrome.tabs.query({}).then(tabs => { for (const tab of tabs) if (tab.id !== undefined) sessions.invalidate(tab.id); }); changed(); });
+  const permissionsChanged=()=>{
+    verifiedDecoders.clear();
+    void chrome.tabs.query({}).then(tabs=>{
+      for(const tab of tabs)if(tab.id!==undefined){observeQueues.delete(tab.id);sessions.invalidate(tab.id,true);}
+      void setup();changed();
+    });
+  };
+  chrome.permissions.onAdded.addListener(permissionsChanged);
+  chrome.permissions.onRemoved.addListener(permissionsChanged);
   const navigation = (details: { tabId: number; frameId: number; url?:string }) => {
     if (details.frameId !== 0) return;
     verifiedDecoders.delete(details.tabId);

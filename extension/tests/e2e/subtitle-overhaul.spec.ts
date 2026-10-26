@@ -7,6 +7,7 @@ test('module headers give space to content/actions; subtitle tracks and settings
   const {context,page,fixture,forbidden}=await setup();
   const output=resolve('../.tmp/subtitle-overhaul-ui');await mkdir(output,{recursive:true});
   try{
+    await page.emulateMedia({reducedMotion:'reduce'});
     for(const [width,height] of [[280,650],[360,800],[490,360],[960,850]]){
       await page.setViewportSize({width,height});
       for(const name of ['笔记','HTML','随笔','字幕']){
@@ -20,7 +21,9 @@ test('module headers give space to content/actions; subtitle tracks and settings
         expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
       }
       const timeline=page.getByLabel('字幕时间轴');
+      await expect(page.locator('.context-current-button strong')).toContainText(/AI (?:翻译|字幕修正)/);
       await expect(timeline).toBeVisible();
+      await expect(page.getByText('连接恢复中，正在核对后台任务状态。',{exact:true})).toHaveCount(0);
       const before=await timeline.boundingBox();
       await page.getByRole('button',{name:'字幕设置',exact:true}).click();
       const popover=page.getByRole('dialog',{name:'字幕设置'});

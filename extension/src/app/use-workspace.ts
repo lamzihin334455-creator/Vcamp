@@ -24,6 +24,10 @@ export function useWorkspace(client: ApplicationClient) {
     setStatus(entry ? entry.pending ? '正在保存…' : entry.failed ? '未保存' : '草稿已保存' : '');
   }, []);
   const accept = useCallback((value: WorkspaceView) => {
+    const previous=current.current;
+    // A snapshot read may predate an acknowledged save even when it is the
+    // newest read. Keep the saved revision used by submit() monotonic too.
+    if(draftKey(value)===draftKey(previous)&&value.draft&&previous?.draft&&value.draft.revision<previous.draft.revision)value={...value,draft:previous.draft};
     current.current = value; setView(value);
     const key = draftKey(value);
     let entry = key ? drafts.current.get(key) : undefined;

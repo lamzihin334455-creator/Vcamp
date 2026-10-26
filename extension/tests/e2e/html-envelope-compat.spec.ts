@@ -9,6 +9,16 @@ test('wrapped model response diagnoses complete, saves only HTML and opens/inter
   const requests:string[]=[];context.on('request',r=>{if(/^https?:/.test(r.url()))requests.push(r.url());});
   try{
     const worker=context.serviceWorkers()[0]??await context.waitForEvent('serviceworker'),id=new URL(worker.url()).host,page=await context.newPage();
+    // Complete background recovery before this fixture creates its synthetic
+    // executor (tab 99). Recovery must not interrupt a partially seeded job.
+    await page.goto(`chrome-extension://${id}/sidepanel.html`);
+    const bootstrap=await page.evaluate(async()=>{
+      const send=(operation:unknown)=>chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation});
+      const workspace=await send({type:'workspace.query'});
+      if(!workspace.ok)return workspace;
+      return send({type:'generation.query',target:{kind:'chat',workspaceId:workspace.view.workspaceId,chatId:workspace.view.chatId}});
+    });
+    expect(bootstrap.ok).toBe(true);
     await page.goto(`chrome-extension://${id}/tests/installed/html-compat-seed.html`);
     await expect(page.locator('#status')).toContainText('workspaceId');
     const saved=JSON.parse((await page.locator('#status').textContent())!);

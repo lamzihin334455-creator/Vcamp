@@ -28,7 +28,7 @@ test('local anchor stays in generated document rather than navigating srcdoc',as
 });
 
 for(const browserLanguage of ['zh-CN','en-US']){
-test(`production permission lifecycle and cover rendering with controlled site fixtures (${browserLanguage})`,async()=>{
+test(`production permission lifecycle and cover rendering with controlled site fixtures (${browserLanguage}; pending inspection=${browserLanguage==='zh-CN'})`,async()=>{
   test.setTimeout(60000);const output=resolve('../.tmp/opt-function',browserLanguage);await mkdir(output,{recursive:true});const metadata=JSON.parse(await readFile(resolve('tests/fixtures/cover-metadata.json'),'utf8')),bundle=resolve(process.env.EXPERIENCE_BUNDLE??'dist'),profile=await mkdtemp(resolve(output,'permissions-'));
   const context=await chromium.launchPersistentContext(profile,{channel:'chromium',headless:true,locale:browserLanguage,viewport:{width:420,height:850},args:[`--load-extension=${bundle}`,`--disable-extensions-except=${bundle}`,`--lang=${browserLanguage}`]});
   try{
@@ -45,10 +45,42 @@ test(`production permission lifecycle and cover rendering with controlled site f
     const saved=await panel.evaluate(async()=>{const query=await chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation:{type:'workspace.query'}});return chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation:{type:'scribble.create',workspaceId:query.view.workspaceId,text:'封面与权限验证资料',time:null}});});expect(saved.ok).toBe(true);
     await panel.getByRole('button',{name:'资料库',exact:true}).click();const img=panel.locator('.library-cover img');await expect(img).toHaveCount(1);await expect.poll(()=>img.evaluate((el:HTMLImageElement)=>el.naturalWidth),{timeout:20000}).toBeGreaterThan(0);await expect(img).toHaveAttribute('src',metadata.coverUrl);const naturalWidth=await img.evaluate((el:HTMLImageElement)=>el.naturalWidth);await panel.screenshot({path:resolve(output,'controlled-cover.png')});
     const management=await context.newPage();await management.goto(`chrome://extensions/?id=${id}`);await writeFile(resolve(output,'site-access-ui.txt'),await management.locator('body').ariaSnapshot());
+    if(browserLanguage==='zh-CN'){
+      // An inspection already in flight may stop responding when native host
+      // access changes. Hold only that old call, keeping real permissions intact.
+      await worker.evaluate(()=>{
+        const original=chrome.scripting.executeScript.bind(chrome.scripting);
+        let release!:()=>void,held=false;
+        const gate=new Promise<void>(resolve=>{release=resolve;});
+        const probe={started:false,release};
+        (globalThis as any).__vcampPermissionProbe=probe;
+        chrome.scripting.executeScript=async(options:any)=>{
+          if(!held&&options.world==='ISOLATED'&&options.args?.[0]==='observe'){held=true;probe.started=true;await gate;}
+          return original(options);
+        };
+      });
+      await panel.evaluate(()=>{void chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),operation:{type:'workspace.query'}}).catch(()=>{});});
+      await expect.poll(()=>worker.evaluate(()=>(globalThis as any).__vcampPermissionProbe.started)).toBe(true);
+    }
     const automatic=management.getByRole('button',{name:/^(?:自动允许访问以下网站|Automatically allow access on the following sites) /});await expect(automatic).toHaveAccessibleName(browserLanguage==='zh-CN'?/^自动允许访问以下网站 /:/^Automatically allow access on the following sites /);await expect(automatic).toHaveAttribute('aria-pressed','true');await automatic.click();await expect(automatic).toHaveAttribute('aria-pressed','false');const access=management.getByRole('button',{name:'https://www.bilibili.com/*',exact:true});await expect(access).toBeEnabled();
     const permissions=()=>panel.evaluate(async()=>({video:await chrome.permissions.contains({origins:['https://www.bilibili.com/*']}),subtitles:await chrome.permissions.contains({origins:['https://api.bilibili.com/*','https://aisubtitle.hdslb.com/*']})}));
     await expect(access).toHaveAttribute('aria-pressed','false');await expect.poll(permissions).toEqual({video:false,subtitles:false});
-    await site.reload();await site.bringToFront();await panel.getByRole('button',{name:'问答',exact:true}).click();await expect(panel.locator('.context-current-button .sr-only')).toHaveText('浏览器未允许读取 B 站');await expect(panel.getByRole('button',{name:'恢复浏览器站点访问'})).toBeVisible();
+    await site.reload();await site.bringToFront();await panel.getByRole('button',{name:'问答',exact:true}).click();
+    try { await expect(panel.locator('.context-current-button .sr-only')).toHaveText('浏览器未允许读取 B 站'); }
+    catch(error) {
+      await writeFile(test.info().outputPath('permission-state.json'),JSON.stringify({
+        panel:await permissions(),
+        background:await worker.evaluate(async()=>({permissions:await chrome.permissions.getAll(),tabs:await chrome.tabs.query({})})),
+        reply:await panel.evaluate(async()=>Promise.race([chrome.runtime.sendMessage({version:1,requestId:crypto.randomUUID(),windowId:(await chrome.windows.getCurrent()).id,operation:{type:'workspace.query'}}),new Promise(resolve=>setTimeout(()=>resolve({timeout:true}),8000))])),
+        text:await panel.locator('body').innerText()
+      },null,2));
+      throw error;
+    }
+    await expect(panel.getByRole('button',{name:'恢复浏览器站点访问'})).toBeVisible();
+    if(browserLanguage==='zh-CN'){
+      await worker.evaluate(()=>(globalThis as any).__vcampPermissionProbe.release());
+      await expect(panel.locator('.context-current-button .sr-only')).toHaveText('浏览器未允许读取 B 站');
+    }
     await access.click();await expect.poll(permissions).toEqual({video:true,subtitles:false});await site.reload();await site.bringToFront();await expect(panel.locator('.context-current-button .sr-only')).toHaveText('浏览器未允许访问字幕站点');
     await automatic.click();await expect.poll(permissions).toEqual({video:true,subtitles:true});await site.reload();await site.bringToFront();await expect(panel.locator('.context-current-button .sr-only')).toHaveText('完整字幕已就绪');
     await writeFile(resolve(output,'permission-cover.json'),JSON.stringify({productionManifest:true,firstOpen:true,reopen:true,sameHostPartSwitch:true,browserUIRevocation:true,subtitleHostRevocation:true,browserUIRestoration:true,cover:{controlledFixture:true,host:new URL(metadata.coverUrl).host,naturalWidth},siteAndSubtitles:'controlled fixtures; cover metadata and image controlled fixtures',modelCalls:0,keyRead:false},null,2));

@@ -81,6 +81,7 @@ for (const withTemplate of [false, true]) test(`actual send action template=${wi
     const states = [];
       await startNewChat(page);
       await expect(page.locator('.context-module')).toHaveText('对话 02');
+      const previousDraft=(await command({type:'workspace.query'})).view.draft;
       if (withTemplate) {
         await page.getByLabel('输入草稿').fill('@风格化交互页面');
         await page.locator('#mention-menu').getByRole('button', {name: '风格化交互页面', exact: true}).click();
@@ -90,7 +91,23 @@ for (const withTemplate of [false, true]) test(`actual send action template=${wi
         await page.getByRole('menuitemradio', {name: /HTML/}).click();
       }
       await page.getByLabel('输入草稿').fill('生成完整风格化交互页面');
+      if(withTemplate)await expect(page.getByRole('status')).toHaveText('草稿已保存');
       const workspace = (await command({type: 'workspace.query'})).view;
+      if(withTemplate){
+        // A read started before the last save can arrive after its ACK. Keep
+        // replaying that prior draft until submission to expose revision rollback.
+        await page.evaluate(previousDraft=>{
+          const original=chrome.runtime.sendMessage.bind(chrome.runtime);let replay=true;
+          (window as any).staleDraftReads=0;
+          chrome.runtime.sendMessage=(async(message:any)=>{
+            if(message.operation?.type==='generation.send')replay=false;
+            const response=await original(message);
+            if(replay&&message.operation?.type==='workspace.query'&&response.ok&&response.view.draft){response.view.draft=previousDraft;(window as any).staleDraftReads++;}
+            return response;
+          }) as any;
+        },previousDraft);
+        await expect.poll(()=>page.evaluate(()=>(window as any).staleDraftReads)).toBeGreaterThan(0);
+      }
       await page.getByRole('button', {name: '发送', exact: true}).click();
       const query = async () => (await command({type: 'generation.query', target: {kind: 'chat', workspaceId: workspace.workspaceId, chatId: workspace.chatId}})).view.generation.jobs.at(-1);
       await expect.poll(async () => (await query())?.state, {timeout: 20000}).toBe('completed');
