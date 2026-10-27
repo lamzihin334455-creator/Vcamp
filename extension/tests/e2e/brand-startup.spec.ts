@@ -47,6 +47,8 @@ test('production startup: shared fade, original UI usable, no replay on interact
     await page.waitForFunction(()=>{const e=document.querySelector('[data-testid="launch-overlay"]');return e&&+getComputedStyle(e).opacity<.8&&+getComputedStyle(e).opacity>.15;});
     await page.screenshot({path:resolve(evidence,'02-shared-fade.png')});
     await expect(page.getByTestId('startup')).toHaveCount(0,{timeout:2500});
+    // DOM removal may precede the next animation-frame observation of its end.
+    await page.waitForFunction(()=>(window as any).startupEvidence.ended>0,undefined,{timeout:1000});
     const data=await page.evaluate(()=>(window as any).startupEvidence);
     await writeFile(resolve(evidence,'csp-events.json'),JSON.stringify(data,null,2));
     // Same two automation eval probes reproduced on unchanged 0.1.29; no application-script violations.
